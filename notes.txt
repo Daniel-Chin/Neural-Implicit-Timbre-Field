@@ -14,7 +14,7 @@ An instrument track is:
     vocal only: 2/3-dim vowel_embedding(t). requires grad
 
 timbre is 
-    energy = timbre(freq, f0, amplitude, [vowel_emb])
+    energy = NIF(freq, f0, amplitude, [vowel_emb])
 
 f0 is:
     pitch. scaler. 
@@ -27,6 +27,12 @@ About optim
 
 vowel_embedding inductive bias
     smooth
+    must add noise, before entering NIF
+    实验结果：
+        不需要 noise, 也不需要 smoothness regularization, 就可以：
+            vowel emb 关于 t 平滑
+            NIF 行为 关于 vowel emb 平滑
+        NIF 神奇
 
 merge instrument tracks. conditions:
     - amplitude-weighted f0-chroma doesn't conflict
@@ -72,3 +78,6 @@ experiments
     few-person acapella
     200-jacob acapella
     4-part choir
+    bird chirps
+        bird "vowel" spave
+        source seperate

@@ -1,5 +1,6 @@
 print('importing py...')
 from typing import *
+from itertools import count
 
 print('importing 3rd-party...')
 import librosa
@@ -11,13 +12,19 @@ import scipy
 from scipy.signal import stft
 from scipy.io import wavfile
 from tqdm import tqdm
+import torch
+from torch import nn
+from torch.nn import functional as F
+from torch.utils.data import DataLoader, Dataset
 
 print('importing dan\'s...')
 from yin import yin
 from harmonicSynth import HarmonicSynth, Harmonic
 from blindDescend import blindDescend
 
-PAGE_LEN = 768
+LR = 1e-2
+
+PAGE_LEN = 512
 SR = 11025
 DTYPE = np.float32
 N_HARMONICS = 100
@@ -86,78 +93,26 @@ def plotUnstretchedPartials(f0, n_partials = 14, color = 'r', alpha = .3):
         plt.axvline(x = freq, color = color, alpha = alpha)
 
 def main():
-    print('main()')
-
-    print('load wav...')
-    raw = []
-
-    y, sr = librosa.load('dan.wav', sr=SR)
-    assert sr == SR
-    raw.append(y)
-
-    # y, sr = librosa.load('yanhe.wav', sr=SR)
-    # assert sr == SR
-    # raw.append(y)
     
-    print('stft...')
-    freqs, times, Zxx = stft(
-        y, fs=SR, nperseg=PAGE_LEN, 
-    )
-    spectrogram = np.abs(Zxx)
 
-    f0s = []
-    amps = []
-    timbres: List[List[Harmonic]] = []
+    while True:
+        ...
 
-    for page_i, (t, page) in tqdm(
-        [*enumerate(zip(times, pagesOf(y)))]
-    ):
-        # spectrum = spectrogram[:, page_i]
-        spectrum = np.abs(rfft(page * HANN)) / PAGE_LEN
-        f0 = yin(
-            page, SR, PAGE_LEN, 
-            fmin=pitch2freq(36), 
-            fmax=pitch2freq(84), 
-        )
-        harmonics_f = np.arange(f0, NYQUIST, f0)
-        assert harmonics_f.size < N_HARMONICS
-        harmonics_a_2 = np.zeros((harmonics_f.size, ))
-        spectrum_2 = np.square(spectrum)
-        bins_taken = 0
-        for partial_i, freq in enumerate(harmonics_f):
-            mid_f_bin = round(freq * PAGE_LEN / SR)
-            for offset in range(-2, 3):
-                try:
-                    harmonics_a_2[partial_i] += spectrum_2[
-                        mid_f_bin + offset
-                    ]
-                except IndexError:
-                    pass
-                else:
-                    bins_taken += 1
-        mean_bin_noise = (spectrum_2.sum() - harmonics_a_2.sum()) / (
-            len(spectrum_2) - bins_taken
-        )
-        harmonics_a_2[harmonics_a_2 < 2 * mean_bin_noise] = 0
-        harmonics_a = np.sqrt(harmonics_a_2)
-
-        harmonics = [
-            Harmonic(f, a) for (f, a) in zip(
-                harmonics_f, 
-                harmonics_a, 
-            )
-        ]
-        freq = harmonics_f[-1]
-        for _ in range(len(harmonics), N_HARMONICS):
-            freq += f0
-            harmonics.append(Harmonic(freq, 0))
-        f0s.append(f0)
-        timbres.append(harmonics)
-        amps.append(np.sqrt(spectrum_2.sum()))
+class NITF(nn.Module):
+    def __init__(self, width, depth, n_vowel_dims) -> None:
+        super().__init__()
+        layers = []
+        in_dim = 3 + n_vowel_dims
+        dim = in_dim
+        for _ in range(depth):
+            layers.append(nn.Linear(dim, width))
+            layers.append(nn.ReLU())
+            dim = width
+        layers.append(nn.Linear(dim, 1))
+        self.sequential = nn.Sequential(*layers)
     
-    # selfRecon(f0s, timbres)
-
-
+    def forward(self, /, x: torch.Tensor) -> torch.Tensor:
+        return self.sequential(x)
 
 def selfRecon(f0s, timbres):
     hS = HarmonicSynth(
@@ -165,7 +120,7 @@ def selfRecon(f0s, timbres):
     )
     buffer = []
 
-    for i, _ in tqdm([*enumerate(f0s)]):
+    for i, _ in tqdm([*enumerate(f0s)], desc='recon'):
         harmonics = timbres[i]
         # harmonics = []
         # for j in range(N_HARMONICS):
@@ -185,4 +140,5 @@ def selfRecon(f0s, timbres):
 
     wavfile.write('self_recon.wav', SR, recon)
 
-main()
+if __name__ == '__main__':
+    main()
