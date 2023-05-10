@@ -8,9 +8,13 @@ amplitude inductive bias
 A piece is a set of instrument tracks. 
 
 An instrument track is:
+    timbre. independent with t. 
     f0(t). intermediate
     amplitude(t). requires grad
-    vocal only: 2/3-dim vowel embedding. requires grad
+    vocal only: 2/3-dim vowel_embedding(t). requires grad
+
+timbre is 
+    energy = timbre(freq, f0, amplitude, [vowel_emb])
 
 f0 is:
     pitch. scaler. 
@@ -20,6 +24,9 @@ f0 is:
 
 About optim
     Parallel may not be important. If algo good, converge fast, few shot, then optim for GPU may be harmful and unecessary. 
+
+vowel_embedding inductive bias
+    smooth
 
 merge instrument tracks. conditions:
     - amplitude-weighted f0-chroma doesn't conflict
