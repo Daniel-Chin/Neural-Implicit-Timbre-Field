@@ -1,0 +1,67 @@
+amplitude inductive bias
+    at first, i thought: assume most amplitude to be 0. Like a lasso loss. 
+    However, imagine: the trumpet time is the superset of violin time. then, under lasso, it would model the violin as containing the trumpet sound, and let trumpet amplitude reach 0 while violin is playing. 
+    So, instead of penalizing amplitude, we should penalize amplitude change. Two ways:
+        - add a loss. 
+        - represent time-amplitude with neural implicit field. (let NN low-freq inductive bias do the work)
+
+A piece is a set of instrument tracks. 
+
+An instrument track is:
+    f0(t). intermediate
+    amplitude(t). requires grad
+    vocal only: 2/3-dim vowel embedding. requires grad
+
+f0 is:
+    pitch. scaler. 
+    octave: 16-dim multi-hot vector. 
+    
+    sum the three octaves near the max in forward pass. 
+
+About optim
+    Parallel may not be important. If algo good, converge fast, few shot, then optim for GPU may be harmful and unecessary. 
+
+merge instrument tracks. conditions:
+    - amplitude-weighted f0-chroma doesn't conflict
+    AND
+        - amplitude is similar
+        OR
+        - timbre is similar
+    Why is this necessary?
+        just start with the right number of tracks?
+        start with 1 track and gradually add tracks until loss doesn't decrease?
+
+variational neural implicit field
+    perturb the input
+
+VENIF
+    variational encoder of neural implicit fields
+    inspired by wave cube synthesis. 
+    what if you can stack NIFs, add VAE-like noise, and interpolate between NIFs? 
+    The rationale: make different NIFs dedicate similar NN locations to related tasks. Make different NIFs robust to brain-interference. 
+    Next, combine with VAE. 
+    Image - encoder - reparametrize - 2d weight-bias field
+    XY coord - 2d weight-bias field as NN - RGB
+    It's a VAE with an oracle decoder, where the oracle decoder is an interpreter to interpret latent field as NN. 
+    
+    experiment
+        interpolate between similar images. 
+            tranlsate view?
+            scale?
+            same scene, diff camera?
+            same object, diff style?
+            swap multiple objects?
+
+Stretched partials:
+    important? no? 
+    neural implicit field?
+
+reverb:
+    important? no? 
+
+experiments
+    polyphonies
+    2 vocals with instruments
+    few-person acapella
+    200-jacob acapella
+    4-part choir
