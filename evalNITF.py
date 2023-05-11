@@ -32,8 +32,8 @@ from workspace import EXP_PATH
 
 PLOT_MAX_FPS = 10
 PLOT_RESOLUTION = 200
-POINT_RADIUS = 3
-VOWEL_SPACE_Z_RADIUS = 2
+POINT_RADIUS = 2
+VOWEL_SPACE_Z_RADIUS = 3
 
 plotVowels = None   # against MVC
 anim = None

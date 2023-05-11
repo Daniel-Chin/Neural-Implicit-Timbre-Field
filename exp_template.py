@@ -33,7 +33,7 @@ template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('harmonics', 1, None), 
 ])
-template.lr = 1e-2
+template.lr = 1e-3
 template.weight_decay = 1e-9
 template.optim_name = 'adam'
 template.nif_width = 128
