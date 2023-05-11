@@ -32,14 +32,16 @@ from workspace import EXP_PATH
 
 PLOT_MAX_FPS = 10
 PLOT_RESOLUTION = 200
+POINT_RADIUS = 3
+VOWEL_SPACE_Z_RADIUS = 2
 
-# replot = None
+plotVowels = None   # against MVC
 anim = None
 
 class LeftFrame(tk.Frame):
     def __init__(
         self, parent, groups: List[ExperimentGroup], 
-        mainUpdate, 
+        refreshNITF, 
         group_selection, 
     ) -> None:
         super().__init__(parent)
@@ -48,14 +50,14 @@ class LeftFrame(tk.Frame):
             rB = tk.Radiobutton(
                 self, text=group.name(), 
                 variable=group_selection, value=i, 
-                command=mainUpdate, 
+                command=refreshNITF, 
             )
             rB.pack(anchor=tk.W)
 
 class RightFrame(tk.Frame):
     class SpinsFrame(tk.Frame):
         def __init__(
-            self, parent, mainUpdate, rand_init_i, epoch, 
+            self, parent, refreshNITF, rand_init_i, epoch, 
         ) -> None:
             super().__init__(parent)
 
@@ -71,7 +73,7 @@ class RightFrame(tk.Frame):
             tk.Spinbox(
                 self, textvariable=rand_init_i, 
                 from_=-1, to=1e8, 
-                command=mainUpdate, 
+                command=refreshNITF, 
             ).grid(
                 row=0, column=1, sticky=tk.NSEW, 
             )
@@ -82,7 +84,7 @@ class RightFrame(tk.Frame):
             tk.Spinbox(
                 self, textvariable=epoch, 
                 from_=0, to=1e8, 
-                command=mainUpdate, 
+                command=refreshNITF, 
             ).grid(
                 row=0, column=3, sticky=tk.NSEW, 
             )
@@ -93,7 +95,7 @@ class RightFrame(tk.Frame):
                 self, parent, 
                 groups: List[ExperimentGroup], 
                 group_selection: tk.IntVar, 
-                mainUpdate, 
+                refreshNITF, 
                 pitch: tk.DoubleVar, amp: tk.DoubleVar, 
                 vowel_emb_zscore_0: tk.DoubleVar, 
                 vowel_emb_zscore_1: tk.DoubleVar, 
@@ -104,7 +106,7 @@ class RightFrame(tk.Frame):
 
                 self.groups = groups
                 self.group_selection = group_selection
-                self.mainUpdate = mainUpdate
+                self.refreshNITF = refreshNITF
                 self.pitch = pitch
                 self.amp = amp
                 self.vowel_emb_zscore_0 = vowel_emb_zscore_0
@@ -128,10 +130,9 @@ class RightFrame(tk.Frame):
                 ax.axhline(y=0, c='k', linewidth=.5)
                 ax.set_xlabel('frequency (Hz)')
                 ax.set_ylabel('envelope')
+                ax.set_ylim(bottom=-.001, top=.01)
                 self.ax = ax
 
-                # global replot
-                # replot = self.replot
                 global anim
                 anim = animation.FuncAnimation(
                     self.fig, self.replot, interval=1000 / PLOT_MAX_FPS, 
@@ -156,30 +157,72 @@ class RightFrame(tk.Frame):
                     self.vowel_emb_zscore_1, 
                 )
                 self.line2D.set_ydata(mag)
-                self.ax.set_ylim(bottom=mag.min(), top=mag.max())
+                # self.ax.set_ylim(bottom=mag.min(), top=mag.max())
 
                 self.fig.tight_layout()
                 # self.throttle = time() + PLOT_MAX_SPF
         
+        class TouchPad(tk.Canvas):
+            def __init__(
+                self, parent: tk.Widget, 
+                nitfContainer: List[NITF], 
+            ) -> None:
+                super().__init__(
+                    parent, background='#dddddd', 
+                )
+
+                self.parent = parent
+                self.nitfContainer = nitfContainer
+
+                global plotVowels
+                plotVowels = self.plotVowels
+            
+            def plotVowels(self):
+                width  = self.parent.winfo_width() * .5
+                height = self.parent.winfo_height()
+                self.configure(width=width, height=height)
+                wh_half = torch.tensor([width, height]) * .5
+                nitf = self.nitfContainer[0]
+                ves = nitf.vowel_embs
+                ves -= ves.mean()
+                ves /= ves.std() * VOWEL_SPACE_Z_RADIUS
+                ves = ves.clip(min=-1, max=+1)
+                ves *= wh_half
+                ves += wh_half
+                self.delete('all')
+                self.create_text(
+                    width * .5, height * .5, 
+                    text='touch pad', 
+                )
+                for i in range(ves.shape[0]):
+                    ve = [x.item() for x in ves[i, :]]
+                    ve.append(0) # in case 1-d ve
+                    self.create_rectangle(
+                        ve[0] - POINT_RADIUS, 
+                        ve[1] - POINT_RADIUS, 
+                        ve[0] + POINT_RADIUS, 
+                        ve[1] + POINT_RADIUS, 
+                    )
+        
         def __init__(
             self, parent, groups, group_selection, 
-            mainUpdate, 
+            refreshNITF, 
             pitch, amp, 
             vowel_emb_zscore_0, vowel_emb_zscore_1, 
             nitfContainer, dataset, 
         ) -> None:
             super().__init__(parent)
 
-            self.mainUpdate = mainUpdate
+            self.refreshNITF = refreshNITF
             self.vowel_emb_zscore_0 = vowel_emb_zscore_0
             self.vowel_emb_zscore_1 = vowel_emb_zscore_1
 
-            self.columnconfigure(0, weight=1)
+            self.columnconfigure(0, weight=0)
             self.columnconfigure(1, weight=1)
             self.rowconfigure(0, weight=1)
 
-            touchPad = tk.Label(
-                self, text='touch pad', background='#dddddd', 
+            touchPad = self.TouchPad(
+                self, nitfContainer, 
             )
             touchPad.grid(
                 row=0, column=0, sticky=tk.NSEW, 
@@ -188,7 +231,7 @@ class RightFrame(tk.Frame):
 
             self.SpectralEnvelopeFrame(
                 self, groups, group_selection, 
-                mainUpdate, pitch, amp, 
+                refreshNITF, pitch, amp, 
                 vowel_emb_zscore_0, vowel_emb_zscore_1, 
                 nitfContainer, dataset, 
             ).grid(
@@ -198,12 +241,12 @@ class RightFrame(tk.Frame):
         def onMotion(self, event: tk.Event):
             x = event.x / self.winfo_width()
             y = event.y / self.winfo_height()
-            self.vowel_emb_zscore_0.set((x - .5) * 4)
-            self.vowel_emb_zscore_1.set((y - .5) * 4)
-            self.mainUpdate()
+            self.vowel_emb_zscore_0.set((x - .5) * 2 * VOWEL_SPACE_Z_RADIUS)
+            self.vowel_emb_zscore_1.set((y - .5) * 2 * VOWEL_SPACE_Z_RADIUS)
+            # self.refreshNITF()
     
     class PitchFrame(tk.Frame):
-        def __init__(self, parent, mainUpdate, pitch) -> None:
+        def __init__(self, parent, refreshNITF, pitch) -> None:
             super().__init__(parent)
 
             tk.Label(self, text="pitch:").pack(
@@ -212,7 +255,7 @@ class RightFrame(tk.Frame):
 
             tk.Scale(
                 self, variable=pitch, 
-                command=mainUpdate, 
+                # command=refreshNITF, 
                 from_=24, to=108, 
                 resolution=0.01, 
                 orient=tk.HORIZONTAL, 
@@ -222,7 +265,7 @@ class RightFrame(tk.Frame):
             )
     
     class AmpFrame(tk.Frame):
-        def __init__(self, parent, mainUpdate, amp) -> None:
+        def __init__(self, parent, refreshNITF, amp) -> None:
             super().__init__(parent)
 
             tk.Label(self, text="amp:").pack(
@@ -231,7 +274,7 @@ class RightFrame(tk.Frame):
 
             tk.Scale(
                 self, variable=amp, 
-                command=mainUpdate, 
+                # command=refreshNITF, 
                 from_=0, to=1e-1, 
                 resolution=1e-3, 
                 orient=tk.HORIZONTAL, 
@@ -242,7 +285,7 @@ class RightFrame(tk.Frame):
     
     def __init__(
         self, parent, groups, group_selection, 
-        mainUpdate, pitch, amp, 
+        refreshNITF, pitch, amp, 
         rand_init_i, epoch, 
         vowel_emb_zscore_0, vowel_emb_zscore_1, 
         nitfContainer, dataset, 
@@ -256,32 +299,32 @@ class RightFrame(tk.Frame):
         self.columnconfigure(0, weight=1)
 
         self.SpinsFrame(
-            self, mainUpdate, rand_init_i, epoch, 
+            self, refreshNITF, rand_init_i, epoch, 
         ).grid(
             row=0, column=0, sticky=tk.NSEW, 
         )
         self.SquaresFrame(
             self, groups, group_selection, 
-            mainUpdate, pitch, amp, 
+            refreshNITF, pitch, amp, 
             vowel_emb_zscore_0, vowel_emb_zscore_1, 
             nitfContainer, dataset, 
         ).grid(
             row=1, column=0, sticky=tk.NSEW, 
         )
         self.PitchFrame(
-            self, mainUpdate, pitch, 
+            self, refreshNITF, pitch, 
         ).grid(
             row=2, column=0, sticky=tk.NSEW, 
         )
         self.AmpFrame(
-            self, mainUpdate, amp, 
+            self, refreshNITF, amp, 
         ).grid(
             row=3, column=0, sticky=tk.NSEW, 
         )
 
 def initRoot(
     root: tk.Tk, groups, 
-    mainUpdate, 
+    refreshNITF, 
     group_selection, pitch, amp, rand_init_i, epoch, 
     vowel_emb_zscore_0, vowel_emb_zscore_1, 
     nitfContainer, dataset, 
@@ -293,7 +336,7 @@ def initRoot(
     root.rowconfigure(0, weight=1)
     
     leftFrame = LeftFrame(
-        root, groups, mainUpdate, group_selection, 
+        root, groups, refreshNITF, group_selection, 
     )
     leftFrame.grid(
         row=0, column=0, sticky=tk.NSEW, 
@@ -301,7 +344,7 @@ def initRoot(
 
     rightFrame = RightFrame(
         root, groups, group_selection, 
-        mainUpdate, pitch, amp, rand_init_i, epoch, 
+        refreshNITF, pitch, amp, rand_init_i, epoch, 
         vowel_emb_zscore_0, vowel_emb_zscore_1, 
         nitfContainer, dataset, 
     )
@@ -423,8 +466,8 @@ def main():
         vowel_emb_zscore_1 = tk.DoubleVar(root, 0)
         nitfContainer = [None]
 
-        def mainUpdate(*_):
-            # global replot
+        def refreshNITF(*_):
+            global plotVowels
 
             cycleIntVar(rand_init_i, 0, n_rand_inits)
             cycleIntVar(epoch, 0, 1e8)
@@ -438,20 +481,20 @@ def main():
             except FileNotFoundError as e:
                 print(e)
                 epoch.set('0')
-                return mainUpdate()
+                return refreshNITF()
             nitfContainer[0] = nitf
 
-            # if replot is not None:
-            #     replot()
+            if plotVowels is not None:
+                plotVowels()
 
         initRoot(
             root, groups, 
-            mainUpdate, 
+            refreshNITF, 
             group_selection, pitch, amp, rand_init_i, epoch, 
             vowel_emb_zscore_0, vowel_emb_zscore_1, 
             nitfContainer, experiment.dataset, 
         )
-        mainUpdate()
+        refreshNITF()
 
         pa = pyaudio.PyAudio()
         aS = AudioStreamer(
@@ -472,7 +515,8 @@ def main():
         try:
             root.mainloop()
         finally:
-            # replot = None   # don't hold onto a widget
+            global plotVowels
+            plotVowels = None   # don't hold onto a widget
             streamOut.close()
             pa.terminate()
 
