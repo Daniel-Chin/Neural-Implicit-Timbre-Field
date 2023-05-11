@@ -11,7 +11,7 @@ from exp_group import ExperimentGroup
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
 EXP_NAME = 'nif_width'
-N_RAND_INITS = 8
+N_RAND_INITS = 2
 SONG_FILENAME = 'yanhe.wav'
 f0s, timbres, amps, dataset = prepare(SONG_FILENAME)
 N_PAGES = len(f0s)

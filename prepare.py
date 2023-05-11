@@ -184,6 +184,11 @@ class NITF(nn.Module):
             (hParams.experiment_globals['N_PAGES'], hParams.n_vowel_dims), 
             requires_grad=True, 
         )
+
+        self.register_buffer('saved_vowel_embs', self.vowel_embs)
+    
+    def parameters(self):
+        return [*super().parameters(), self.vowel_embs]
     
     def forward(self, /, x: torch.Tensor) -> torch.Tensor:
         return self.sequential(x)

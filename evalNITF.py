@@ -235,6 +235,7 @@ def loadNITF(group, rand_init_i, epoch):
     )
     nitf = models['nitf'][0]
     nitf.eval()
+    nitf.vowel_embs = nitf.get_buffer('saved_vowel_embs')
     return nitf
 
 class AudioStreamer:
@@ -270,20 +271,28 @@ class AudioStreamer:
         ve[0] += ve_std[0] * self.vowel_emb_zscore_0.get()
         if n_vowel_dims >= 2:
             ve[1] += ve_std[1] * self.vowel_emb_zscore_1.get()
+        ve = ve.float()
 
         f0 = pitch2freq(self.pitch.get())
+        X = torch.stack((
+            torch.arange(1, N_HARMONICS + 1, dtype=torch.float32) * f0, 
+            torch.ones((N_HARMONICS, ), dtype=torch.float32) * f0, 
+            torch.ones((N_HARMONICS, ), dtype=torch.float32) * self.amp.get(), 
+        ), dim=1)
+        X_vowel = torch.concat((
+            X, ve.unsqueeze(0).repeat(N_HARMONICS, 1), 
+        ), dim=1)
+        mag = self.dataset.retransformY(
+            nitf.forward(X_vowel).detach(), 
+        ).clip(min=0)
         harmonics = []
         for partial_i in range(N_HARMONICS):
-            freq = f0 * (1 + partial_i)
-            x = torch.tensor((
-                freq, f0, self.amp.get(), 
+            harmonics.append(Harmonic(
+                X[partial_i, 0].item(), 
+                mag[partial_i].item(), 
             ))
-            x = self.dataset.transformX(x)
-            x = torch.concat((x, ve), dim=0).float()
-            mag = self.dataset.retransformY(
-                nitf.forward(x).detach(), 
-            ).item()
-            harmonics.append(Harmonic(freq, mag))
+        # print('f', X[:, 0])
+        print('a', mag.max())
         self.hS.eat(harmonics)
         return self.hS.mix(), pyaudio.paContinue
 
