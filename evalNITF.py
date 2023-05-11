@@ -110,7 +110,7 @@ class RightFrame(tk.Frame):
             self.rowconfigure(0, weight=1)
 
             touchPad = tk.Label(
-                self, text='touch pad', background='#ddffff', 
+                self, text='touch pad', background='#dddddd', 
             )
             touchPad.grid(
                 row=0, column=0, sticky=tk.NSEW, 
@@ -261,40 +261,40 @@ class AudioStreamer:
         self.dataset = dataset
 
     def nextPageOut(self, in_data, frame_count, time_info, status):
-        assert frame_count == PAGE_LEN
-        nitf = self.nitfContainer[0]
-        group = self.groups[self.group_selection.get()]
-        n_vowel_dims = group.hyperParams.n_vowel_dims
-        ve_mean = nitf.vowel_embs.mean(dim=0)
-        ve_std  = nitf.vowel_embs.std(dim=0)
-        ve = ve_mean
-        ve[0] += ve_std[0] * self.vowel_emb_zscore_0.get()
-        if n_vowel_dims >= 2:
-            ve[1] += ve_std[1] * self.vowel_emb_zscore_1.get()
-        ve = ve.float()
+        with torch.no_grad():
+            assert frame_count == PAGE_LEN
+            nitf = self.nitfContainer[0]
+            group = self.groups[self.group_selection.get()]
+            n_vowel_dims = group.hyperParams.n_vowel_dims
+            ve_mean = nitf.vowel_embs.mean(dim=0)
+            ve_std  = nitf.vowel_embs.std(dim=0)
+            ve = ve_mean
+            ve[0] += ve_std[0] * self.vowel_emb_zscore_0.get()
+            if n_vowel_dims >= 2:
+                ve[1] += ve_std[1] * self.vowel_emb_zscore_1.get()
+            ve = ve.float()
 
-        f0 = pitch2freq(self.pitch.get())
-        X = torch.stack((
-            torch.arange(1, N_HARMONICS + 1, dtype=torch.float32) * f0, 
-            torch.ones((N_HARMONICS, ), dtype=torch.float32) * f0, 
-            torch.ones((N_HARMONICS, ), dtype=torch.float32) * self.amp.get(), 
-        ), dim=1)
-        X_vowel = torch.concat((
-            X, ve.unsqueeze(0).repeat(N_HARMONICS, 1), 
-        ), dim=1)
-        mag = self.dataset.retransformY(
-            nitf.forward(X_vowel).detach(), 
-        ).clip(min=0)
-        harmonics = []
-        for partial_i in range(N_HARMONICS):
-            harmonics.append(Harmonic(
-                X[partial_i, 0].item(), 
-                mag[partial_i].item(), 
-            ))
-        # print('f', X[:, 0])
-        print('a', mag.max())
-        self.hS.eat(harmonics)
-        return self.hS.mix(), pyaudio.paContinue
+            f0 = pitch2freq(self.pitch.get())
+            X = torch.stack((
+                torch.arange(1, N_HARMONICS + 1, dtype=torch.float32) * f0, 
+                torch.ones((N_HARMONICS, ), dtype=torch.float32) * f0, 
+                torch.ones((N_HARMONICS, ), dtype=torch.float32) * self.amp.get(), 
+            ), dim=1)
+            X_vowel = torch.concat((
+                self.dataset.transformX(X), 
+                ve.unsqueeze(0).repeat(N_HARMONICS, 1), 
+            ), dim=1)
+            mag = self.dataset.retransformY(
+                nitf.forward(X_vowel), 
+            ).clip(min=0)
+            harmonics = []
+            for partial_i in range(N_HARMONICS):
+                harmonics.append(Harmonic(
+                    X[partial_i, 0].item(), 
+                    mag[partial_i].item(), 
+                ))
+            self.hS.eat(harmonics)
+            return self.hS.mix(), pyaudio.paContinue
 
 def main():
     with torch.no_grad():
