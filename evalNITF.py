@@ -1,6 +1,7 @@
 from os import path
 from typing import *
 from functools import lru_cache
+from time import time
 
 import torch
 from torchWork import loadExperiment, DEVICE
@@ -8,7 +9,6 @@ from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModel
 import tkinter as tk
 import matplotlib
 matplotlib.use('TkAgg')
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg,
     NavigationToolbar2Tk, 
@@ -28,6 +28,8 @@ from prepare import *
 from exp_group import ExperimentGroup
 
 from workspace import EXP_PATH
+
+replot = None
 
 class LeftFrame(tk.Frame):
     def __init__(
@@ -82,26 +84,51 @@ class RightFrame(tk.Frame):
     
     class SquaresFrame(tk.Frame):
         class SpectralEnvelopeFrame(tk.Frame):
+            MAX_SPF = 1 / 10
+
             def __init__(self, parent) -> None:
                 super().__init__(parent)
 
-                fig = Figure(figsize=(.2, .1), dpi=100)
+                global replot
+                replot = self.replot
+
+                self.canvas: tk.Canvas = None
+                self.first = True
+                self.throttle = 0
+            
+            def replot(self):
+                if time() < self.throttle:
+                    return
+
+                if self.canvas is not None:
+                    self.canvas.destroy()
+                    self.canvas = None
+
+                fig = plt.figure(
+                    figsize=(.2, .1), dpi=100, 
+                    num=1, clear=True, # "static" memory
+                )
                 figure_canvas = FigureCanvasTkAgg(fig, self)
-                NavigationToolbar2Tk(figure_canvas, self)
+                if self.first:
+                    NavigationToolbar2Tk(figure_canvas, self)
                 ax = fig.add_subplot()
-                ax.plot([1,3,2,4,10,5])
+                ax.plot(np.random.randn(10))
                 fig.tight_layout()
-                figure_canvas.get_tk_widget().pack(
+                self.canvas = figure_canvas.get_tk_widget()
+                self.canvas.pack(
                     side=tk.TOP, fill=tk.BOTH, expand=True, 
                 )
+                self.throttle = time() + self.MAX_SPF
+                self.first = False
         
         def __init__(
-            self, parent, 
+            self, parent, mainUpdate, 
             vowel_emb_zscore_0: tk.DoubleVar, 
             vowel_emb_zscore_1: tk.DoubleVar, 
         ) -> None:
             super().__init__(parent)
 
+            self.mainUpdate = mainUpdate
             self.vowel_emb_zscore_0 = vowel_emb_zscore_0
             self.vowel_emb_zscore_1 = vowel_emb_zscore_1
 
@@ -126,6 +153,7 @@ class RightFrame(tk.Frame):
             y = event.y / self.winfo_height()
             self.vowel_emb_zscore_0.set((x - .5) * 4)
             self.vowel_emb_zscore_1.set((y - .5) * 4)
+            self.mainUpdate()
     
     class PitchFrame(tk.Frame):
         def __init__(self, parent, mainUpdate, pitch) -> None:
@@ -184,7 +212,8 @@ class RightFrame(tk.Frame):
             row=0, column=0, sticky=tk.NSEW, 
         )
         self.SquaresFrame(
-            self, vowel_emb_zscore_0, vowel_emb_zscore_1, 
+            self, mainUpdate, 
+            vowel_emb_zscore_0, vowel_emb_zscore_1, 
         ).grid(
             row=1, column=0, sticky=tk.NSEW, 
         )
@@ -333,6 +362,9 @@ def main():
                 epoch.set('0')
                 return mainUpdate()
             nitfContainer[0] = nitf
+
+            if replot is not None:
+                replot()
 
         initRoot(
             root, groups, 
