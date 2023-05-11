@@ -13,6 +13,8 @@ SLOW_EVAL_EPOCH_INTERVAL = 1
 EXP_NAME = ...
 N_RAND_INITS = 8
 SONG_FILENAME = ...
+f0s, timbres, amps, dataset = prepare(SONG_FILENAME)
+N_PAGES = len(f0s)
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:

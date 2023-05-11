@@ -12,6 +12,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
+import pyaudio
 
 from yin import yin
 from harmonicSynth import HarmonicSynth, Harmonic
@@ -21,6 +22,7 @@ from hyper_params import HyperParams
 PAGE_LEN = 512
 SR = 11025
 DTYPE = np.float32
+DTYPE_PA = pyaudio.paFloat32
 N_HARMONICS = 100
 
 TWO_PI = np.pi * 2
@@ -97,6 +99,9 @@ class MyDataset(Dataset):
     
     def transformX(self, x):
         return (x - self.X_mean) / self.X_std
+    
+    def retransformY(self, y):
+        return y * self.Y_std + self.Y_mean
 
     def __len__(self):
         return self.X.shape[0]
