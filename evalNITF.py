@@ -116,7 +116,7 @@ class RightFrame(tk.Frame):
                     figsize=(.2, .1), dpi=100, 
                 )
                 figure_canvas = FigureCanvasTkAgg(self.fig, self)
-                NavigationToolbar2Tk(figure_canvas, self)
+                # NavigationToolbar2Tk(figure_canvas, self)
                 self.canvas = figure_canvas.get_tk_widget()
                 self.canvas.pack(
                     side=tk.TOP, fill=tk.BOTH, expand=True, 
