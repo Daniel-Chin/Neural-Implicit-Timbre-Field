@@ -1,7 +1,6 @@
 from os import path
 from typing import *
 from functools import lru_cache
-from time import time
 
 import torch
 from torchWork import loadExperiment, DEVICE
@@ -13,6 +12,8 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg,
     NavigationToolbar2Tk, 
 )
+from matplotlib.figure import Figure
+import matplotlib.animation as animation
 import pyaudio
 
 try:
@@ -29,7 +30,11 @@ from exp_group import ExperimentGroup
 
 from workspace import EXP_PATH
 
-replot = None
+PLOT_MAX_FPS = 10
+PLOT_RESOLUTION = 200
+
+# replot = None
+anim = None
 
 class LeftFrame(tk.Frame):
     def __init__(
@@ -84,47 +89,84 @@ class RightFrame(tk.Frame):
     
     class SquaresFrame(tk.Frame):
         class SpectralEnvelopeFrame(tk.Frame):
-            MAX_SPF = 1 / 10
-
-            def __init__(self, parent) -> None:
+            def __init__(
+                self, parent, 
+                groups: List[ExperimentGroup], 
+                group_selection: tk.IntVar, 
+                mainUpdate, 
+                pitch: tk.DoubleVar, amp: tk.DoubleVar, 
+                vowel_emb_zscore_0: tk.DoubleVar, 
+                vowel_emb_zscore_1: tk.DoubleVar, 
+                nitfContainer: List[NITF], 
+                dataset: MyDataset, 
+            ) -> None:
                 super().__init__(parent)
 
-                global replot
-                replot = self.replot
+                self.groups = groups
+                self.group_selection = group_selection
+                self.mainUpdate = mainUpdate
+                self.pitch = pitch
+                self.amp = amp
+                self.vowel_emb_zscore_0 = vowel_emb_zscore_0
+                self.vowel_emb_zscore_1 = vowel_emb_zscore_1
+                self.nitfContainer = nitfContainer
+                self.dataset = dataset
 
-                self.canvas: tk.Canvas = None
-                self.first = True
-                self.throttle = 0
-            
-            def replot(self):
-                if time() < self.throttle:
-                    return
-
-                if self.canvas is not None:
-                    self.canvas.destroy()
-                    self.canvas = None
-
-                fig = plt.figure(
+                self.fig = Figure(
                     figsize=(.2, .1), dpi=100, 
-                    num=1, clear=True, # "static" memory
                 )
-                figure_canvas = FigureCanvasTkAgg(fig, self)
-                if self.first:
-                    NavigationToolbar2Tk(figure_canvas, self)
-                ax = fig.add_subplot()
-                ax.plot(np.random.randn(10))
-                fig.tight_layout()
+                figure_canvas = FigureCanvasTkAgg(self.fig, self)
+                NavigationToolbar2Tk(figure_canvas, self)
                 self.canvas = figure_canvas.get_tk_widget()
                 self.canvas.pack(
                     side=tk.TOP, fill=tk.BOTH, expand=True, 
                 )
-                self.throttle = time() + self.MAX_SPF
-                self.first = False
+                ax = self.fig.add_subplot()
+                X = np.linspace(0, NYQUIST, PLOT_RESOLUTION)
+                self.line2D = ax.plot(X, np.ones_like(X))[0]
+                self.X = torch.Tensor(X)
+                ax.axhline(y=0, c='k', linewidth=.5)
+                ax.set_xlabel('frequency (Hz)')
+                ax.set_ylabel('envelope')
+                self.ax = ax
+
+                # global replot
+                # replot = self.replot
+                global anim
+                anim = animation.FuncAnimation(
+                    self.fig, self.replot, interval=1000 / PLOT_MAX_FPS, 
+                )
+
+                # self.throttle = 0
+            
+            def replot(self, _):
+                # if time() < self.throttle:
+                #     return
+
+                if self.nitfContainer[0] is None:
+                    return
+                f0 = pitch2freq(self.pitch.get())
+                mag = inference(
+                    self.X, 
+                    f0, 
+                    self.nitfContainer, self.groups, 
+                    self.dataset, self.group_selection, 
+                    self.amp, 
+                    self.vowel_emb_zscore_0, 
+                    self.vowel_emb_zscore_1, 
+                )
+                self.line2D.set_ydata(mag)
+                self.ax.set_ylim(bottom=mag.min(), top=mag.max())
+
+                self.fig.tight_layout()
+                # self.throttle = time() + PLOT_MAX_SPF
         
         def __init__(
-            self, parent, mainUpdate, 
-            vowel_emb_zscore_0: tk.DoubleVar, 
-            vowel_emb_zscore_1: tk.DoubleVar, 
+            self, parent, groups, group_selection, 
+            mainUpdate, 
+            pitch, amp, 
+            vowel_emb_zscore_0, vowel_emb_zscore_1, 
+            nitfContainer, dataset, 
         ) -> None:
             super().__init__(parent)
 
@@ -144,7 +186,12 @@ class RightFrame(tk.Frame):
             )
             touchPad.bind('<Motion>', self.onMotion)
 
-            self.SpectralEnvelopeFrame(self).grid(
+            self.SpectralEnvelopeFrame(
+                self, groups, group_selection, 
+                mainUpdate, pitch, amp, 
+                vowel_emb_zscore_0, vowel_emb_zscore_1, 
+                nitfContainer, dataset, 
+            ).grid(
                 row=0, column=1, sticky=tk.NSEW, 
             )
         
@@ -194,9 +241,11 @@ class RightFrame(tk.Frame):
             )
     
     def __init__(
-        self, parent, mainUpdate, pitch, amp, 
+        self, parent, groups, group_selection, 
+        mainUpdate, pitch, amp, 
         rand_init_i, epoch, 
         vowel_emb_zscore_0, vowel_emb_zscore_1, 
+        nitfContainer, dataset, 
     ) -> None:
         super().__init__(parent)
 
@@ -212,8 +261,10 @@ class RightFrame(tk.Frame):
             row=0, column=0, sticky=tk.NSEW, 
         )
         self.SquaresFrame(
-            self, mainUpdate, 
+            self, groups, group_selection, 
+            mainUpdate, pitch, amp, 
             vowel_emb_zscore_0, vowel_emb_zscore_1, 
+            nitfContainer, dataset, 
         ).grid(
             row=1, column=0, sticky=tk.NSEW, 
         )
@@ -233,11 +284,12 @@ def initRoot(
     mainUpdate, 
     group_selection, pitch, amp, rand_init_i, epoch, 
     vowel_emb_zscore_0, vowel_emb_zscore_1, 
+    nitfContainer, dataset, 
 ) -> None:
     root.title('Eval NITF')
 
     root.columnconfigure(0, weight=1)
-    root.columnconfigure(1, weight=3)
+    root.columnconfigure(1, weight=5)
     root.rowconfigure(0, weight=1)
     
     leftFrame = LeftFrame(
@@ -248,9 +300,10 @@ def initRoot(
     )
 
     rightFrame = RightFrame(
-        root, 
+        root, groups, group_selection, 
         mainUpdate, pitch, amp, rand_init_i, epoch, 
         vowel_emb_zscore_0, vowel_emb_zscore_1, 
+        nitfContainer, dataset, 
     )
     rightFrame.grid(
         row=0, column=1, sticky=tk.NSEW, 
@@ -260,7 +313,7 @@ def loadNITF(group, rand_init_i, epoch):
     epoch, models = loadLatestModels(
         EXP_PATH, group, rand_init_i, dict(
             nitf=(NITF, 1), 
-        ), epoch, 
+        ), epoch, verbose=False, 
     )
     nitf = models['nitf'][0]
     nitf.eval()
@@ -292,38 +345,61 @@ class AudioStreamer:
     def nextPageOut(self, in_data, frame_count, time_info, status):
         with torch.no_grad():
             assert frame_count == PAGE_LEN
-            nitf = self.nitfContainer[0]
-            group = self.groups[self.group_selection.get()]
-            n_vowel_dims = group.hyperParams.n_vowel_dims
-            ve_mean = nitf.vowel_embs.mean(dim=0)
-            ve_std  = nitf.vowel_embs.std(dim=0)
-            ve = ve_mean
-            ve[0] += ve_std[0] * self.vowel_emb_zscore_0.get()
-            if n_vowel_dims >= 2:
-                ve[1] += ve_std[1] * self.vowel_emb_zscore_1.get()
-            ve = ve.float()
 
             f0 = pitch2freq(self.pitch.get())
-            X = torch.stack((
-                torch.arange(1, N_HARMONICS + 1, dtype=torch.float32) * f0, 
-                torch.ones((N_HARMONICS, ), dtype=torch.float32) * f0, 
-                torch.ones((N_HARMONICS, ), dtype=torch.float32) * self.amp.get(), 
-            ), dim=1)
-            X_vowel = torch.concat((
-                self.dataset.transformX(X), 
-                ve.unsqueeze(0).repeat(N_HARMONICS, 1), 
-            ), dim=1)
-            mag = self.dataset.retransformY(
-                nitf.forward(X_vowel), 
+            freqs = torch.arange(1, N_HARMONICS + 1, dtype=torch.float32) * f0
+            mag = inference(
+                freqs, 
+                f0, 
+                self.nitfContainer, self.groups, 
+                self.dataset, self.group_selection, 
+                self.amp, 
+                self.vowel_emb_zscore_0, 
+                self.vowel_emb_zscore_1, 
             ).clip(min=0)
             harmonics = []
             for partial_i in range(N_HARMONICS):
                 harmonics.append(Harmonic(
-                    X[partial_i, 0].item(), 
+                    freqs[partial_i].item(), 
                     mag[partial_i].item(), 
                 ))
             self.hS.eat(harmonics)
             return self.hS.mix(), pyaudio.paContinue
+
+def inference(
+    freqs: torch.Tensor, f0, 
+    nitfContainer: List[NITF], 
+    groups: List[ExperimentGroup], 
+    dataset: MyDataset, 
+    group_selection: tk.IntVar, 
+    amp: tk.DoubleVar, 
+    vowel_emb_zscore_0: tk.DoubleVar, 
+    vowel_emb_zscore_1: tk.DoubleVar, 
+):
+    nitf = nitfContainer[0]
+    group = groups[group_selection.get()]
+    n_vowel_dims = group.hyperParams.n_vowel_dims
+    ve_mean = nitf.vowel_embs.mean(dim=0)
+    ve_std  = nitf.vowel_embs.std(dim=0)
+    ve = ve_mean
+    ve[0] += ve_std[0] * vowel_emb_zscore_0.get()
+    if n_vowel_dims >= 2:
+        ve[1] += ve_std[1] * vowel_emb_zscore_1.get()
+    ve = ve.float()
+
+    X = torch.stack((
+        freqs, 
+        torch.ones_like(freqs) * f0, 
+        torch.ones_like(freqs) * amp.get(), 
+    ), dim=1)
+    X_vowel = torch.concat((
+        dataset.transformX(X), 
+        ve.unsqueeze(0).repeat(X.shape[0], 1), 
+    ), dim=1)
+    mag = dataset.retransformY(
+        nitf.forward(X_vowel), 
+    )
+    return mag
 
 def main():
     with torch.no_grad():
@@ -340,7 +416,7 @@ def main():
 
         group_selection = tk.IntVar(root, 0)
         pitch = tk.DoubleVar(root, 60)
-        amp = tk.DoubleVar(root, .001)
+        amp = tk.DoubleVar(root, .01)
         rand_init_i = tk.StringVar(root, 0)
         epoch = tk.StringVar(root, 0)
         vowel_emb_zscore_0 = tk.DoubleVar(root, 0)
@@ -348,6 +424,8 @@ def main():
         nitfContainer = [None]
 
         def mainUpdate(*_):
+            # global replot
+
             cycleIntVar(rand_init_i, 0, n_rand_inits)
             cycleIntVar(epoch, 0, 1e8)
 
@@ -363,14 +441,15 @@ def main():
                 return mainUpdate()
             nitfContainer[0] = nitf
 
-            if replot is not None:
-                replot()
+            # if replot is not None:
+            #     replot()
 
         initRoot(
             root, groups, 
             mainUpdate, 
             group_selection, pitch, amp, rand_init_i, epoch, 
             vowel_emb_zscore_0, vowel_emb_zscore_1, 
+            nitfContainer, experiment.dataset, 
         )
         mainUpdate()
 
@@ -393,6 +472,7 @@ def main():
         try:
             root.mainloop()
         finally:
+            # replot = None   # don't hold onto a widget
             streamOut.close()
             pa.terminate()
 
