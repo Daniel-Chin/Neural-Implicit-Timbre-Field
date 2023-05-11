@@ -32,11 +32,9 @@ def main():
         len(groups), 'x', n_rand_inits, 
     )
 
-    f0s, timbres, amps, dataset = prepare()
-
     runExperiment(
         exp_py_path, requireModelClasses, oneEpoch, 
-        dataset, None, 
+        experiment.dataset, None, 
     )
 
 def oneEpoch(
@@ -67,6 +65,12 @@ def oneEpoch(
             epoch, batch_i, True, profiler, lossTree, 
             hParams.lossWeightTree, 
         )
+
+    saveModels(models, epoch, save_path)
+    if epoch % 8 == 0:
+        print(group_name, 'epoch', epoch, 'finished.')
+    
+    return True
 
 if __name__ == '__main__':
     main()

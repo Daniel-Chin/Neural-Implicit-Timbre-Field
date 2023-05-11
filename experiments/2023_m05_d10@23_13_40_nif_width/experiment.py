@@ -9,16 +9,18 @@ from hyper_params import *
 
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
-EXP_NAME = ...
+EXP_NAME = 'nif_width'
 N_RAND_INITS = 8
-SONG_FILENAME = ...
+SONG_FILENAME = 'yanhe.wav'
+f0s, timbres, amps, dataset = prepare(SONG_FILENAME)
+N_PAGES = len(f0s)
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = ...
-        self.variable_value = hyperParams.???
+        self.variable_name = 'nif_width'
+        self.variable_value = hyperParams.nif_width
     
     @lru_cache(1)
     def name(self):
@@ -39,8 +41,8 @@ template.n_vowel_dims = 2
 template.batch_size = 2 ** 12
 template.max_epoch = 10000
 
-for xxx in []:
+for nif_width in [64, 128, 256]:
     hP = deepcopy(template)
-    hP.xxx = xxx
+    hP.nif_width = nif_width
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

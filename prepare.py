@@ -16,6 +16,8 @@ from torch.utils.data import DataLoader, Dataset
 from yin import yin
 from harmonicSynth import HarmonicSynth, Harmonic
 
+from hyper_params import HyperParams
+
 PAGE_LEN = 512
 SR = 11025
 DTYPE = np.float32
@@ -161,20 +163,20 @@ def getStreams(y):
     return f0s, timbres, amps
 
 class NITF(nn.Module):
-    def __init__(self, width, depth, n_vowel_dims, n_pages) -> None:
+    def __init__(self, hParams: HyperParams) -> None:
         super().__init__()
         layers = []
-        in_dim = 3 + n_vowel_dims
+        in_dim = 3 + hParams.n_vowel_dims
         dim = in_dim
-        for _ in range(depth):
-            layers.append(nn.Linear(dim, width))
+        for _ in range(hParams.nif_depth):
+            layers.append(nn.Linear(dim, hParams.nif_width))
             layers.append(nn.ReLU())
-            dim = width
+            dim = hParams.nif_width
         layers.append(nn.Linear(dim, 1))
         self.sequential = nn.Sequential(*layers)
 
         self.vowel_embs = torch.zeros(
-            (n_pages, n_vowel_dims), 
+            (hParams.experiment_globals['N_PAGES'], hParams.n_vowel_dims), 
             requires_grad=True, 
         )
     

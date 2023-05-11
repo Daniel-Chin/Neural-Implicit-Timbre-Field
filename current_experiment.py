@@ -11,6 +11,9 @@ SLOW_EVAL_EPOCH_INTERVAL = 1
 
 EXP_NAME = 'nif_width'
 N_RAND_INITS = 8
+SONG_FILENAME = 'yanhe.wav'
+f0s, timbres, amps, dataset = prepare(SONG_FILENAME)
+N_PAGES = len(f0s)
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
@@ -34,7 +37,7 @@ template.weight_decay = 1e-9
 template.optim_name = 'adam'
 template.nif_width = 128
 template.nif_depth = 6
-template.n_vowel_dim = 2
+template.n_vowel_dims = 2
 template.batch_size = 2 ** 12
 template.max_epoch = 10000
 

@@ -1,2 +1,4 @@
 *.wav
 *.pyc
+experiments/**/losses.torchworklosslog
+*.pt

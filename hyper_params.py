@@ -1,7 +1,5 @@
 __all__ = [
-    'HyperParams', 'ScheduledSampling', 
-    'LinearScheduledSampling', 'SigmoidScheduledSampling', 
-    'ScheduledImageLoss', 
+    'HyperParams', 
 ]
 
 from typing import *
@@ -21,7 +19,7 @@ class HyperParams(BaseHyperParams):
         
         self.nif_width: int = None
         self.nif_depth: int = None
-        self.n_vowel_dim: int = None
+        self.n_vowel_dims: int = None
 
         self.batch_size: int = None
         # self.grad_clip: Optional[float] = None
