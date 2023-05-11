@@ -2,10 +2,11 @@ from typing import *
 from functools import lru_cache
 from copy import deepcopy
 
-from torchWork import LossWeightTree, ExperimentGroup
+from torchWork import LossWeightTree
 
 from prepare import *
 from hyper_params import *
+from exp_group import ExperimentGroup
 
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
