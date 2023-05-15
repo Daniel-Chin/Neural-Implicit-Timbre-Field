@@ -4,7 +4,6 @@ __all__ = [
     'PAGE_LEN', 
     'SR', 
     'DTYPE', 
-    'DTYPE_PA', 
     'N_HARMONICS', 
     'TWO_PI', 
     'HANN', 
