@@ -39,7 +39,7 @@ def main():
             truth_amp.append(amp)
         
     def f():
-        for epoch in count():
+        for epoch in count(step=10):
             print(f'{epoch = }')
             # plt.plot(truth_t, truth_f0, linewidth=.5, label='YIN')
             # plt.plot(truth_t, truth_amp, linewidth=.5, label='Ground truth')

@@ -16,7 +16,7 @@ LOSS_TYPES_TO_PLOT = [
 plotLosses = PlotLosses(
     path.join(EXP_PATH, EXPERIMENT_PY_FILENAME), 
     LOSS_TYPES_TO_PLOT, using_epoch_not_batch=True, 
-    average_over=1, start=0, 
+    average_over=1, start=7, 
     which_legend=0, linewidth=.5, 
 )
 fig = next(plotLosses)

@@ -1,6 +1,5 @@
 from os import path
 from typing import *
-from itertools import count
 
 import numpy as np
 import torch
@@ -16,7 +15,7 @@ from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 from train import forwardF0IsLatent
 
-from workspace import EXP_PATH, TIME_SLICE
+from workspace import EXP_PATH, TIME_SLICE, EPOCHS
 
 def main():
     with torch.no_grad():
@@ -32,7 +31,7 @@ def main():
             # for rand_init_i in range(n_rand_inits):
             rand_init_i = 0
             if True:
-                for epoch in range(300, 310):
+                for epoch in EPOCHS:
                     try:
                         nitf = loadNITFForEval(
                             EXP_PATH, experiment.datasetDef, 
