@@ -1,0 +1,39 @@
+#!/bin/python3
+
+import os
+import subprocess as sp
+
+def main():
+    try:
+        os.remove('./auto.sbatch')
+    except FileNotFoundError:
+        pass
+
+    running_jobs = []
+    with sp.Popen(['squeue', '-u', os.getenv('USER')], stdout=sp.PIPE) as p:
+        p.wait()
+        assert p.stdout is not None
+        while True:
+            line: bytes = p.stdout.readline()
+            if line == b'':
+                break
+            line = line.decode().lstrip(' ')
+            first_part = line.split(' ', 1)[0]
+            try:
+                job_id = str(int(first_part))
+            except ValueError:
+                continue
+            running_jobs.append(job_id)
+            print('Running:', job_id)
+    for filename in os.listdir():
+        if filename[-4:] not in ('.out', '.err'):
+            continue
+        for job_id in running_jobs:
+            if job_id in filename:
+                break
+        else:
+            print('rm', filename)
+            # input('Confirm...')
+            os.remove(filename)
+
+main()
