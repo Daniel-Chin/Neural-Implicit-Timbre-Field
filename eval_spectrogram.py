@@ -5,7 +5,7 @@ from itertools import count
 import numpy as np
 import torch
 from torchWork import loadExperiment, DEVICE
-from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
+from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, getTrainerPath
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
@@ -44,8 +44,11 @@ def main():
                     evalOne(nitf, dataset, group.hyperParams)
                     # plt.show()
                     plt.savefig(path.join(
-                        EXP_PATH, 
-                        group.pathName(), 
+                        getTrainerPath(
+                            EXP_PATH, 
+                            group.pathName(), 
+                            rand_init_i, 
+                        ), 
                         f'spectrogram_{epoch}.png', 
                     ))
 

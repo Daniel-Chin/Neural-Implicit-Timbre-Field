@@ -1,4 +1,6 @@
 *.wav
 *.pyc
 experiments/**/losses.torchworklosslog
+experiments/**/spectr*.png
 *.pt
+*.gz

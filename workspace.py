@@ -4,7 +4,7 @@ from typing import *
 
 EXP_PATH = path.join('./experiments/',
 '''
-2023_m05_d15@17_12_18_f0_is_latent
+2023_m05_d15@17_38_11_f0_is_latent
 '''
 .strip())
 

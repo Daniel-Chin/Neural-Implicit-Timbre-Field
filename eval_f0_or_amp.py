@@ -28,17 +28,21 @@ def main():
         print(f'{exp_name = }')
 
         dataset: MyDataset = experiment.dataset
-        yin_t = []
-        yin_f0 = []
+        truth_t = []
+        truth_f0 = []
+        truth_amp = []
         for i, page in enumerate(pagesOf(dataset.wav)):
             f0 = yin(page, SR, PAGE_LEN)
-            yin_t.append(i * PAGE_LEN / SR)
-            yin_f0.append(f0)
+            amp = np.sqrt(np.square(page).sum())
+            truth_t.append(i * PAGE_LEN / SR)
+            truth_f0.append(f0)
+            truth_amp.append(amp)
         
     def f():
         for epoch in count():
             print(f'{epoch = }')
-            plt.plot(yin_t, yin_f0, linewidth=.5, label='YIN')
+            # plt.plot(truth_t, truth_f0, linewidth=.5, label='YIN')
+            # plt.plot(truth_t, truth_amp, linewidth=.5, label='Ground truth')
             for group in groups:
                 kw = dict(label=group.name())
                 # for rand_init_i in range(n_rand_inits):
@@ -54,6 +58,7 @@ def main():
                     plt.plot(
                         dataset.times, 
                         nitf.f0_latent, 
+                        # nitf.amp_latent, 
                         linewidth=.5, 
                         **kw, 
                     )
