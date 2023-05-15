@@ -2,6 +2,7 @@ from itertools import chain
 
 import torch
 from torch import nn
+from torchWork import DEVICE
 
 from hyper_params import HyperParams
 from dataset_definitions import DatasetDefinition
@@ -31,16 +32,19 @@ class NITF(nn.Module):
             self.vowel_embs = torch.zeros(
                 (dataset.n_pages, hParams.n_vowel_dims), 
                 requires_grad=True, 
+                device=DEVICE, 
             )
             self.register_buffer('saved_vowel_embs', self.vowel_embs)
             if datasetDef.is_f0_latent:
                 self.f0_latent = torch.ones(
                     (dataset.n_pages, ), 
+                    device=DEVICE, 
                 ) * 200
                 self.f0_latent.requires_grad = True
                 self.amp_latent = torch.ones(
                     (dataset.n_pages, ), 
                     requires_grad=True, 
+                    device=DEVICE, 
                 )
                 self.register_buffer(
                     'saved_f0_latent', self.f0_latent, 
