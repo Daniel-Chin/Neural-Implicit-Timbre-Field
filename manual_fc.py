@@ -21,3 +21,9 @@ class ManualFC:
         x = (self.weight * x).sum(dim=-1)
         x = x + self.final_bias
         return x
+    
+    def to(self, device):
+        self.bias = self.bias.to(device)
+        self.weight = self.weight.to(device)
+        self.final_bias = self.final_bias.to(device)
+        return self

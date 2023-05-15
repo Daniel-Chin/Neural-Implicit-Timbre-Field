@@ -3,6 +3,7 @@ from functools import lru_cache
 import torch
 import numpy as np
 from numpy.fft import rfft
+from torchWork import DEVICE
 
 from shared import *
 from manual_fc import ManualFC
@@ -41,7 +42,7 @@ def getLobe(resolution=30):
     Y = lobeAt(X)
     X = torch.tensor([*X, +2.5])
     Y = torch.tensor([*Y, 0])
-    return ManualFC(X, Y)
+    return ManualFC(X, Y).to(DEVICE)
 
 # @lru_cache()
 # def getLobe(resolution=21):   # deprecated due to sharp x=0
@@ -49,7 +50,7 @@ def getLobe(resolution=30):
 #     Y = lobeAt(X)
 #     X = torch.tensor(X)
 #     Y = torch.tensor(Y)
-#     mFC = ManualFC(X[:51], Y[:51])
+#     mFC = ManualFC(X[:51], Y[:51]).to(DEVICE)
 #     def lobe(x: torch.Tensor):
 #         return mFC(- x.abs())
 #     return lobe
