@@ -15,6 +15,8 @@ from hyper_params import HyperParams
 from arg_parser import ArgParser
 from nitf import NITF
 from dataset_definitions import DatasetDefinition
+from dataset import MyDataset
+from exp_group import ExperimentGroup
 
 def requireModelClasses(_):
     x = {}
@@ -34,9 +36,17 @@ def main():
         len(groups), 'x', n_rand_inits, 
     )
 
+    dataset: MyDataset = experiment.dataset
+    group: ExperimentGroup = groups[0]
+    hParams: HyperParams = group.hyperParams
+    print(
+        f'In group {group.name()}, # of batches per epoch =', 
+        len(dataset) / hParams.batch_size, 
+    )
+
     runExperiment(
         exp_py_path, requireModelClasses, oneEpoch, 
-        experiment.dataset, None, 
+        dataset, None, 
     )
 
 def oneEpoch(
@@ -54,19 +64,12 @@ def oneEpoch(
     dataLoader = DataLoader(trainSet, hParams.batch_size, shuffle=True)
     for batch_i, batch in enumerate(dataLoader):
         if datasetDef.is_f0_latent:
-            x, page_i = batch
+            losses = batchF0IsLatent(nitf, *batch)
         else:
-            x, y, page_i = batch
-            nitf_in = torch.concat((
-                x, nitf.vowel_embs[page_i], 
-            ), dim=1)
-        y_hat = nitf.forward(nitf_in)
-        if datasetDef.is_f0_latent:
-            ...
-        else:
-            loss = F.mse_loss(y_hat[:, 0], y)
+            losses = batchF0NotLatent(nitf, *batch)
         optim.zero_grad()
-        loss.backward()
+        for loss in losses:
+            loss.backward()
         optim.step()
 
         lossTree = Loss_root()
@@ -81,6 +84,33 @@ def oneEpoch(
         print(group_name, 'epoch', epoch, 'finished.')
     
     return True
+
+def batchF0NotLatent(nitf: NITF, x, y, page_i):
+    nitf_in = torch.concat((
+        x, nitf.vowel_embs[page_i, :], 
+    ), dim=1)
+    y_hat = nitf.forward(nitf_in)
+    yield F.mse_loss(y_hat[:, 0], y)
+
+LADDER = torch.arange(0, N_HARMONICS).float().unsqueeze(
+    0
+).contiguous() + 1
+def batchF0IsLatent(
+    nitf: NITF, x, page_i, 
+):
+    f0  = nitf. f0_latent[page_i]
+    amp = nitf.amp_latent[page_i]
+    ve  = nitf.vowel_embs[page_i, :]
+
+    freq = f0.unsqueeze(1) @ LADDER
+    # freq is (batch_size, N_HARMONICS)
+    nitf_in = torch.concat((
+        freq.unsqueeze(2), 
+        f0 .unsqueeze(1).repeat(1, N_HARMONICS).unsqueeze(2), 
+        amp.unsqueeze(1).repeat(1, N_HARMONICS).unsqueeze(2), 
+        ve .unsqueeze(1).repeat(1, N_HARMONICS, 1), 
+    ), dim=2)
+    mag = nitf.forward(nitf_in)[:, :, 0]
 
 if __name__ == '__main__':
     main()

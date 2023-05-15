@@ -18,9 +18,19 @@ class DatasetDefinition:
 dF = DatasetDefinition()
 dF.wav_path = './dataset/dan.wav'
 dF.is_f0_latent = False
-danUseYin = dF
+danF0NotLatent = dF
 
 dF = DatasetDefinition()
 dF.wav_path = './dataset/yanhe.wav'
 dF.is_f0_latent = False
-heUseYin = dF
+heF0NotLatent = dF
+
+dF = DatasetDefinition()
+dF.wav_path = './dataset/dan.wav'
+dF.is_f0_latent = True
+danF0IsLatent = dF
+
+dF = DatasetDefinition()
+dF.wav_path = './dataset/yanhe.wav'
+dF.is_f0_latent = True
+heF0IsLatent = dF

@@ -9,7 +9,7 @@ from hyper_params import *
 from exp_group import ExperimentGroup
 from dataset import MyDataset
 
-from dataset_definitions import danUseYin as datasetDef
+from dataset_definitions import danF0NotLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
 EXP_NAME = ...

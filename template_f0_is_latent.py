@@ -12,16 +12,16 @@ from dataset import MyDataset
 from dataset_definitions import danF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
-EXP_NAME = 'refactor_check'
-N_RAND_INITS = 1
+EXP_NAME = ...
+N_RAND_INITS = 8
 dataset = MyDataset(datasetDef)
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'nif_depth'
-        self.variable_value = hyperParams.nif_depth
+        self.variable_name = ...
+        self.variable_value = hyperParams.???
     
     @lru_cache(1)
     def name(self):
@@ -42,8 +42,8 @@ template.n_vowel_dims = 2
 template.batch_size = 256
 template.max_epoch = 10000
 
-for nif_depth in [2, 3, 4, 5, 6, 7, 8]:
+for xxx in []:
     hP = deepcopy(template)
-    hP.nif_depth = nif_depth
+    hP.xxx = xxx
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

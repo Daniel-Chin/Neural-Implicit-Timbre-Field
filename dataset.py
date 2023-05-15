@@ -2,6 +2,7 @@ from typing import *
 
 import numpy as np
 from numpy.fft import rfft
+from scipy.signal import stft
 import librosa
 import torch
 from torch.utils.data import Dataset
@@ -25,12 +26,23 @@ class MyDataset(Dataset):
         assert sr == SR
 
         if datasetDef.is_f0_latent:
-            ...
-            self.n_pages = ...
+            self.freqs, self.times, Zxx = stft(
+                y, fs=SR, nperseg=PAGE_LEN, 
+            )
+            X = torch.tensor(np.abs(Zxx))
+            self.n_pages = len(self.times)
+
+            self.X_std = X.std(dim=0)
+            X = X / self.X_std
+
+            self.X = X.contiguous()
+            self.PAGE_I = torch.arange(
+                0, self.n_pages, dtype=torch.long, 
+            ).contiguous()
         else:
             f0s, timbres, amps = self.getStreams(y)
             self.n_pages = len(f0s)
-            self.initUseYin(f0s, timbres, amps)
+            self.initF0IsLatent(f0s, timbres, amps)
         
         print('dataset ok')
 
@@ -88,7 +100,7 @@ class MyDataset(Dataset):
         
         return f0s, timbres, amps
 
-    def initUseYin(
+    def initF0IsLatent(
         self, f0s, timbres: List[List[Harmonic]], amps, 
     ):
         I = []
@@ -109,9 +121,9 @@ class MyDataset(Dataset):
             #     page_X, vowel_emb.unsqueeze(0).repeat(len(harmonics), 1), 
             # ), dim=1))
             X.append(page_X)
-        X = torch.concat(X, dim=0).float()
-        Y = torch.tensor(Y).float()
-        I = torch.tensor(I, dtype=torch.long)
+        X = torch.concat(X, dim=0).float().contiguous()
+        Y = torch.tensor(Y).float().contiguous()
+        I = torch.tensor(I, dtype=torch.long).contiguous()
 
         self.X_mean = X.mean(dim=0)
         X = X - self.X_mean

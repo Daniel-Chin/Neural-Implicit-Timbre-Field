@@ -21,10 +21,10 @@ from typing import *
 
 import numpy as np
 from matplotlib import pyplot as plt
-import scipy
+import scipy.signal
 import pyaudio
 
-PAGE_LEN = 512
+PAGE_LEN = 256
 SR = 11025
 DTYPE = np.float32
 DTYPE_PA = pyaudio.paFloat32
