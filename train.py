@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from typing import *
+from math import log2
 
 import torch
-from torch import nn
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
 import torchWork
@@ -13,6 +13,8 @@ from prepare import *
 from losses import Loss_root
 from hyper_params import HyperParams
 from arg_parser import ArgParser
+from nitf import NITF
+from dataset_definitions import DatasetDefinition
 
 def requireModelClasses(_):
     x = {}
@@ -42,19 +44,27 @@ def oneEpoch(
     experiment, hParams: HyperParams, 
     models: Dict[str, List[torch.nn.Module]], 
     optim: torch.optim.Optimizer, 
-    trainSet: Dataset, validateSet: Dataset, 
+    trainSet: Dataset, _: Dataset, 
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, trainer_id: int, 
 ):
+    datasetDef: DatasetDefinition = experiment.datasetDef
     nitf: NITF = models['nitf'][0]
     nitf.train()
     dataLoader = DataLoader(trainSet, hParams.batch_size, shuffle=True)
-    for batch_i, (x, y, page_i) in enumerate(dataLoader):
-        x_vowel = torch.concat((
-            x, nitf.vowel_embs[page_i], 
-        ), dim=1)
-        y_hat = nitf.forward(x_vowel)
-        loss = F.mse_loss(y_hat[:, 0], y)
+    for batch_i, batch in enumerate(dataLoader):
+        if datasetDef.is_f0_latent:
+            x, page_i = batch
+        else:
+            x, y, page_i = batch
+            nitf_in = torch.concat((
+                x, nitf.vowel_embs[page_i], 
+            ), dim=1)
+        y_hat = nitf.forward(nitf_in)
+        if datasetDef.is_f0_latent:
+            ...
+        else:
+            loss = F.mse_loss(y_hat[:, 0], y)
         optim.zero_grad()
         loss.backward()
         optim.step()
@@ -67,7 +77,7 @@ def oneEpoch(
         )
 
     saveModels(models, epoch, save_path)
-    if epoch % 8 == 0:
+    if epoch == 0 or log2(epoch).is_integer():
         print(group_name, 'epoch', epoch, 'finished.')
     
     return True

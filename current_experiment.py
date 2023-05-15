@@ -7,15 +7,14 @@ from torchWork import LossWeightTree
 from prepare import *
 from hyper_params import *
 from exp_group import ExperimentGroup
+from dataset import MyDataset
 
+from dataset_definitions import danUseYin as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
-EXP_NAME = 'nif_depth'
+EXP_NAME = 'refactor_check'
 N_RAND_INITS = 1
-# SONG_FILENAME = 'yanhe.wav'
-SONG_FILENAME = 'dan.wav'
-f0s, timbres, amps, dataset = prepare(SONG_FILENAME)
-N_PAGES = len(f0s)
+dataset = MyDataset(datasetDef)
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:

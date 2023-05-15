@@ -2,6 +2,7 @@ from os import path
 from typing import *
 from functools import lru_cache
 
+import numpy as np
 import torch
 from torchWork import loadExperiment, DEVICE
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
@@ -16,17 +17,15 @@ from matplotlib.figure import Figure
 import matplotlib.animation as animation
 import pyaudio
 
-try:
+from import_dan_py import ImportDanPy
+with ImportDanPy():
+    from harmonicSynth import HarmonicSynth, Harmonic
     from selectAudioDevice import selectAudioDevice
-except ImportError as e:
-    module_name = str(e).split('No module named ', 1)[1].strip().strip('"\'')
-    print(f'Missing module {module_name}. Please download at')
-    print(f'https://github.com/Daniel-Chin/Python_Lib/blob/master/{module_name}.py')
-    input('Press Enter to quit...')
-    raise e
 
 from prepare import *
 from exp_group import ExperimentGroup
+from nitf import NITF
+from dataset import MyDataset
 
 from workspace import EXP_PATH
 
@@ -35,7 +34,7 @@ PLOT_RESOLUTION = 200
 POINT_RADIUS = 2
 VOWEL_SPACE_Z_RADIUS = 3
 
-plotVowels = None   # against MVC
+plotVowels = None   # violates MVC
 anim = None
 
 class LeftFrame(tk.Frame):
