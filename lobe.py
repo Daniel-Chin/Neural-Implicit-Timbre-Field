@@ -28,7 +28,7 @@ def test():
     X = np.linspace(-4, +4, 1000)
     Y = lobeAt(X)
     lobe = getLobe()
-    Y_ = lobe(torch.tensor(X).unsqueeze(1))
+    Y_ = lobe(torch.tensor(X))
     plt.plot(X, Y, label='truth')
     plt.plot(X, Y_, label='fit', linewidth=.5)
 

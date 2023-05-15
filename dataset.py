@@ -22,25 +22,29 @@ class MyDataset(Dataset):
 
         self.datasetDef = datasetDef
 
+        print('read wav...')
         y, sr = librosa.load(datasetDef.wav_path, sr=SR)
+        print('read wav ok')
         assert sr == SR
 
         if datasetDef.is_f0_latent:
+            # print('stft...')
             freqs, times, Zxx = stft(
                 y, fs=SR, nperseg=PAGE_LEN, 
             )
-            self.freqs = torch.tensor(freqs)
-            self.times = torch.tensor(times)
+            # print('stft ok')
+            self.freqs = torch.tensor(freqs).float()
+            self.times = torch.tensor(times).float()
             self.n_freq_bins = len(freqs)
             self.one_over_freq_bin = 1 / self.freqs[1]
-            X = torch.tensor(np.abs(Zxx))
+            X = torch.tensor(np.abs(Zxx)).T.float().contiguous()
             self.n_pages = len(self.times)
 
             self.X_std = X.std(dim=0)
             X = X / self.X_std
 
             self.X = X.contiguous()
-            self.PAGE_I = torch.arange(
+            self.I = torch.arange(
                 0, self.n_pages, dtype=torch.long, 
             ).contiguous()
         else:

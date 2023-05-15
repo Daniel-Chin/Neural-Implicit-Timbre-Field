@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import *
-from math import log2
 from functools import lru_cache
 
 import torch
@@ -63,7 +62,10 @@ def oneEpoch(
     datasetDef: DatasetDefinition = experiment.datasetDef
     nitf: NITF = models['nitf'][0]
     nitf.train()
-    dataLoader = DataLoader(trainSet, hParams.batch_size, shuffle=True)
+    dataLoader = DataLoader(
+        trainSet, hParams.batch_size, shuffle=True, 
+        drop_last=True, 
+    )
     for batch_i, batch in enumerate(dataLoader):
         if datasetDef.is_f0_latent:
             losses = batchF0IsLatent(nitf, trainSet, hParams, *batch)
@@ -82,7 +84,7 @@ def oneEpoch(
         )
 
     saveModels(models, epoch, save_path)
-    if epoch == 0 or log2(epoch).is_integer():
+    if epoch < 4 or (epoch ** .5).is_integer():
         print(group_name, 'epoch', epoch, 'finished.')
     
     return True
@@ -124,11 +126,11 @@ def batchF0IsLatent(
     freqCube = getFreqCube(
         hParams.batch_size, dataset.n_freq_bins, 
     )
-    freqCube = freqCube - freq * dataset.one_over_freq_bin
+    freqCube = freqCube - (freq * dataset.one_over_freq_bin).unsqueeze(2)
     freqCube = getLobe()(freqCube)
-    freqCube = freqCube * (mag * amp)
+    freqCube = freqCube * (mag * amp.unsqueeze(1)).unsqueeze(2)
     x_hat = freqCube.sum(dim=1)
-    return F.mse_loss(x_hat, x)
+    yield F.mse_loss(x_hat, x)
 
 if __name__ == '__main__':
     main()
