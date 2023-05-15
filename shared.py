@@ -22,12 +22,10 @@ from typing import *
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy.signal
-import pyaudio
 
 PAGE_LEN = 256
 SR = 11025
 DTYPE = np.float32
-DTYPE_PA = pyaudio.paFloat32
 N_HARMONICS = 100
 
 TWO_PI = np.pi * 2

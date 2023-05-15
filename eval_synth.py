@@ -35,6 +35,8 @@ PLOT_RESOLUTION = 200
 POINT_RADIUS = 2
 VOWEL_SPACE_Z_RADIUS = 3
 
+DTYPE_PA = pyaudio.paFloat32
+
 plotVowels = None   # violates MVC
 anim = None
 
