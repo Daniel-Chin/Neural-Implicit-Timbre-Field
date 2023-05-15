@@ -12,7 +12,7 @@ from dataset import MyDataset
 from dataset_definitions import danF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
-EXP_NAME = 'refactor_check'
+EXP_NAME = 'f0_is_latent'
 N_RAND_INITS = 1
 dataset = MyDataset(datasetDef)
 

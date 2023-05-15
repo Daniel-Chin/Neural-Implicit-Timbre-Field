@@ -26,9 +26,13 @@ class MyDataset(Dataset):
         assert sr == SR
 
         if datasetDef.is_f0_latent:
-            self.freqs, self.times, Zxx = stft(
+            freqs, times, Zxx = stft(
                 y, fs=SR, nperseg=PAGE_LEN, 
             )
+            self.freqs = torch.tensor(freqs)
+            self.times = torch.tensor(times)
+            self.n_freq_bins = len(freqs)
+            self.one_over_freq_bin = 1 / self.freqs[1]
             X = torch.tensor(np.abs(Zxx))
             self.n_pages = len(self.times)
 

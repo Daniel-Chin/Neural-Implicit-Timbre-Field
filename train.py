@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import *
 from math import log2
+from functools import lru_cache
 
 import torch
 from torch.nn import functional as F
@@ -17,6 +18,7 @@ from nitf import NITF
 from dataset_definitions import DatasetDefinition
 from dataset import MyDataset
 from exp_group import ExperimentGroup
+from lobe import getLobe
 
 def requireModelClasses(_):
     x = {}
@@ -54,7 +56,7 @@ def oneEpoch(
     experiment, hParams: HyperParams, 
     models: Dict[str, List[torch.nn.Module]], 
     optim: torch.optim.Optimizer, 
-    trainSet: Dataset, _: Dataset, 
+    trainSet: MyDataset, _: Dataset, 
     lossLogger: LossLogger, profiler: Profiler, 
     save_path: str, trainer_id: int, 
 ):
@@ -64,7 +66,7 @@ def oneEpoch(
     dataLoader = DataLoader(trainSet, hParams.batch_size, shuffle=True)
     for batch_i, batch in enumerate(dataLoader):
         if datasetDef.is_f0_latent:
-            losses = batchF0IsLatent(nitf, *batch)
+            losses = batchF0IsLatent(nitf, trainSet, hParams, *batch)
         else:
             losses = batchF0NotLatent(nitf, *batch)
         optim.zero_grad()
@@ -92,11 +94,19 @@ def batchF0NotLatent(nitf: NITF, x, y, page_i):
     y_hat = nitf.forward(nitf_in)
     yield F.mse_loss(y_hat[:, 0], y)
 
+@lru_cache()
+def getFreqCube(batch_size, n_freq_bins):
+    x = torch.arange(0, n_freq_bins).float()
+    x = x.unsqueeze(0).repeat(N_HARMONICS, 1)
+    x = x.unsqueeze(0).repeat(batch_size, 1, 1)
+    return x
+
 LADDER = torch.arange(0, N_HARMONICS).float().unsqueeze(
     0
 ).contiguous() + 1
 def batchF0IsLatent(
-    nitf: NITF, x, page_i, 
+    nitf: NITF, dataset: MyDataset, hParams: HyperParams, 
+    x, page_i, 
 ):
     f0  = nitf. f0_latent[page_i]
     amp = nitf.amp_latent[page_i]
@@ -111,6 +121,14 @@ def batchF0IsLatent(
         ve .unsqueeze(1).repeat(1, N_HARMONICS, 1), 
     ), dim=2)
     mag = nitf.forward(nitf_in)[:, :, 0]
+    freqCube = getFreqCube(
+        hParams.batch_size, dataset.n_freq_bins, 
+    )
+    freqCube = freqCube - freq * dataset.one_over_freq_bin
+    freqCube = getLobe()(freqCube)
+    freqCube = freqCube * (mag * amp)
+    x_hat = freqCube.sum(dim=1)
+    return F.mse_loss(x_hat, x)
 
 if __name__ == '__main__':
     main()
