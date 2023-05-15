@@ -26,6 +26,7 @@ class MyDataset(Dataset):
         y, sr = librosa.load(datasetDef.wav_path, sr=SR)
         print('read wav ok')
         assert sr == SR
+        self.wav = y
 
         if datasetDef.is_f0_latent:
             # print('stft...')

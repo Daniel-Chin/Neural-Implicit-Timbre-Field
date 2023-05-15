@@ -34,11 +34,11 @@ class NITF(nn.Module):
             )
             self.register_buffer('saved_vowel_embs', self.vowel_embs)
             if datasetDef.is_f0_latent:
-                self.f0_latent = torch.zeros(
+                self.f0_latent = (torch.ones(
                     (dataset.n_pages, ), 
                     requires_grad=True, 
-                )
-                self.amp_latent = torch.zeros(
+                ) * 300).detach()
+                self.amp_latent = torch.ones(
                     (dataset.n_pages, ), 
                     requires_grad=True, 
                 )

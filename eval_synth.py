@@ -5,7 +5,7 @@ from functools import lru_cache
 import numpy as np
 import torch
 from torchWork import loadExperiment, DEVICE
-from torchWork.experiment_control import EXPERIMENT_PY_FILENAME, loadLatestModels
+from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
 import tkinter as tk
 import matplotlib
 matplotlib.use('TkAgg')
@@ -26,6 +26,7 @@ from shared import *
 from exp_group import ExperimentGroup
 from nitf import NITF
 from dataset import MyDataset
+from load_for_eval import loadNITFForEval
 
 from workspace import EXP_PATH
 
@@ -351,17 +352,6 @@ def initRoot(
         row=0, column=1, sticky=tk.NSEW, 
     )
 
-def loadNITF(group, rand_init_i, epoch):
-    epoch, models = loadLatestModels(
-        EXP_PATH, group, rand_init_i, dict(
-            nitf=(NITF, 1), 
-        ), epoch, verbose=False, 
-    )
-    nitf = models['nitf'][0]
-    nitf.eval()
-    nitf.vowel_embs = nitf.get_buffer('saved_vowel_embs')
-    return nitf
-
 class AudioStreamer:
     def __init__(
         self, nitfContainer: List[NITF], 
@@ -452,7 +442,10 @@ def main():
 
         @lru_cache()
         def loadNITFWithCache(group_i, rand_init_i, epoch):
-            return loadNITF(groups[group_i], rand_init_i, epoch)
+            return loadNITFForEval(
+                EXP_PATH, experiment.datasetDef, 
+                groups[group_i], rand_init_i, epoch, 
+            )
 
         root = tk.Tk()
 

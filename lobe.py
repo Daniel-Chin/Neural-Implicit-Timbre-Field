@@ -5,7 +5,7 @@ import numpy as np
 from numpy.fft import rfft
 
 from shared import *
-from manualFC import ManualFC
+from manual_fc import ManualFC
 
 def sino(freq, length):
     return np.sin(np.arange(length) * freq * TWO_PI / SR)

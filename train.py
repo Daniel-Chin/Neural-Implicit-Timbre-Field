@@ -86,6 +86,7 @@ def oneEpoch(
     saveModels(models, epoch, save_path)
     if epoch < 4 or (epoch ** .5).is_integer():
         print(group_name, 'epoch', epoch, 'finished.')
+        print('last batch loss =', loss.item())
     
     return True
 
@@ -106,10 +107,11 @@ def getFreqCube(batch_size, n_freq_bins):
 LADDER = torch.arange(0, N_HARMONICS).float().unsqueeze(
     0
 ).contiguous() + 1
-def batchF0IsLatent(
+def forwardF0IsLatent(
     nitf: NITF, dataset: MyDataset, hParams: HyperParams, 
-    x, page_i, 
+    page_i, batch_size_override=None, 
 ):
+    batch_size = batch_size_override or hParams.batch_size
     f0  = nitf. f0_latent[page_i]
     amp = nitf.amp_latent[page_i]
     ve  = nitf.vowel_embs[page_i, :]
@@ -124,12 +126,18 @@ def batchF0IsLatent(
     ), dim=2)
     mag = nitf.forward(nitf_in)[:, :, 0]
     freqCube = getFreqCube(
-        hParams.batch_size, dataset.n_freq_bins, 
+        batch_size, dataset.n_freq_bins, 
     )
     freqCube = freqCube - (freq * dataset.one_over_freq_bin).unsqueeze(2)
     freqCube = getLobe()(freqCube)
     freqCube = freqCube * (mag * amp.unsqueeze(1)).unsqueeze(2)
-    x_hat = freqCube.sum(dim=1)
+    return freqCube.sum(dim=1)
+
+def batchF0IsLatent(
+    nitf: NITF, dataset: MyDataset, hParams: HyperParams, 
+    x, page_i, 
+):
+    x_hat = forwardF0IsLatent(nitf, dataset, hParams, page_i)
     yield F.mse_loss(x_hat, x)
 
 if __name__ == '__main__':
