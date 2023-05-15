@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 __all__ = [
+    'FREQ_SCALE', 
     'PAGE_LEN', 
     'SR', 
     'DTYPE', 
@@ -21,6 +22,8 @@ from typing import *
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy.signal
+
+FREQ_SCALE = 1e3
 
 PAGE_LEN = 256
 SR = 11025

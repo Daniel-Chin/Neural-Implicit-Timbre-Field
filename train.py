@@ -112,7 +112,7 @@ def forwardF0IsLatent(
     page_i, batch_size_override=None, 
 ):
     batch_size = batch_size_override or hParams.batch_size
-    f0  = nitf. f0_latent[page_i]
+    f0  = nitf. f0_latent[page_i] * FREQ_SCALE
     amp = nitf.amp_latent[page_i]
     ve  = nitf.vowel_embs[page_i, :]
 

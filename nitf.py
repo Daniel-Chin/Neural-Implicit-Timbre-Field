@@ -4,6 +4,7 @@ import torch
 from torch import nn
 from torchWork import DEVICE
 
+from shared import *
 from hyper_params import HyperParams
 from dataset_definitions import DatasetDefinition
 from dataset import MyDataset
@@ -39,7 +40,7 @@ class NITF(nn.Module):
                 self.f0_latent = torch.ones(
                     (dataset.n_pages, ), 
                     device=DEVICE, 
-                ) * 200
+                ) * 200 / FREQ_SCALE
                 self.f0_latent.requires_grad = True
                 self.amp_latent = torch.ones(
                     (dataset.n_pages, ), 

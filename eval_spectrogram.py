@@ -32,7 +32,7 @@ def main():
             # for rand_init_i in range(n_rand_inits):
             rand_init_i = 0
             if True:
-                for epoch in count():
+                for epoch in range(300, 310):
                     try:
                         nitf = loadNITFForEval(
                             EXP_PATH, experiment.datasetDef, 
@@ -50,18 +50,20 @@ def main():
                             rand_init_i, 
                         ), 
                         f'spectrogram_{epoch}.png', 
-                    ))
+                    ), dpi=200)
 
 def evalOne(nitf: NITF, dataset: MyDataset, hParams):
-    fig, axes = plt.subplots(2, 1, sharex=True)
+    fig = plt.figure()
+    axes = fig.subplots(2, 1, sharex=True)
     axes: List[plt.Axes] = axes.tolist()
     times = dataset.times[TIME_SLICE]
-    data = dataset.X.T[:, TIME_SLICE]
+    data = dataset.X.T[:, TIME_SLICE].log()
+    vmin = data.min()
     vmax = data.max()
     # print('plot 0...')
     axes[0].pcolormesh(
         times, dataset.freqs, data, 
-        vmin=0, vmax=vmax, 
+        vmin=vmin, vmax=vmax, 
     )
     axes[0].set_title('Ground truth')
     axes[0].set_xlabel('Time (sec)')
@@ -73,12 +75,13 @@ def evalOne(nitf: NITF, dataset: MyDataset, hParams):
     )
     # print('plot 1...')
     pcm = axes[1].pcolormesh(
-        times, dataset.freqs, x_hat.T, 
-        vmin=0, vmax=vmax, 
+        times, dataset.freqs, x_hat.T.clip(1e-8).log(), 
+        vmin=vmin, vmax=vmax, 
     )
     axes[1].set_title('Recon')
     axes[1].set_xlabel('Time (sec)')
     axes[1].set_ylabel('Freq (Hz)')
+    fig.tight_layout()
     fig.colorbar(pcm, ax=axes)
 
 if __name__ == '__main__':
