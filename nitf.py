@@ -37,7 +37,7 @@ class NITF(nn.Module):
                 self.f0_latent = torch.ones(
                     (dataset.n_pages, ), 
                 ) * 200
-                self.f0_latent.retain_grad = True
+                self.f0_latent.require_grad = True
                 self.amp_latent = torch.ones(
                     (dataset.n_pages, ), 
                     requires_grad=True, 

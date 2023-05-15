@@ -7,6 +7,7 @@ import librosa
 import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
+from torchWork import DEVICE
 
 from import_dan_py import ImportDanPy
 with ImportDanPy():
@@ -44,10 +45,10 @@ class MyDataset(Dataset):
             self.X_std = X.std(dim=0)
             X = X / self.X_std
 
-            self.X = X.contiguous()
+            self.X = X.to(DEVICE).contiguous()
             self.I = torch.arange(
                 0, self.n_pages, dtype=torch.long, 
-            ).contiguous()
+            ).to(DEVICE).contiguous()
         else:
             f0s, timbres, amps = self.getStreams(y)
             self.n_pages = len(f0s)
@@ -130,9 +131,9 @@ class MyDataset(Dataset):
             #     page_X, vowel_emb.unsqueeze(0).repeat(len(harmonics), 1), 
             # ), dim=1))
             X.append(page_X)
-        X = torch.concat(X, dim=0).float().contiguous()
-        Y = torch.tensor(Y).float().contiguous()
-        I = torch.tensor(I, dtype=torch.long).contiguous()
+        X = torch.concat(X, dim=0).float().to(DEVICE).contiguous()
+        Y = torch.tensor(Y).float().to(DEVICE).contiguous()
+        I = torch.tensor(I, dtype=torch.long).to(DEVICE).contiguous()
 
         self.X_mean = X.mean(dim=0)
         X = X - self.X_mean

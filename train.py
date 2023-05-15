@@ -7,7 +7,7 @@ import torch
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
 import torchWork
-from torchWork import runExperiment, Profiler, LossLogger, saveModels, HAS_CUDA, loadExperiment
+from torchWork import runExperiment, Profiler, LossLogger, saveModels, HAS_CUDA, loadExperiment, DEVICE
 
 from shared import *
 from losses import Loss_root
@@ -102,11 +102,11 @@ def getFreqCube(batch_size, n_freq_bins):
     x = torch.arange(0, n_freq_bins).float()
     x = x.unsqueeze(0).repeat(N_HARMONICS, 1)
     x = x.unsqueeze(0).repeat(batch_size, 1, 1)
-    return x
+    return x.to(DEVICE)
 
 LADDER = torch.arange(0, N_HARMONICS).float().unsqueeze(
     0
-).contiguous() + 1
+).to(DEVICE).contiguous() + 1
 def forwardF0IsLatent(
     nitf: NITF, dataset: MyDataset, hParams: HyperParams, 
     page_i, batch_size_override=None, 
