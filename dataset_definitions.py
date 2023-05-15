@@ -7,7 +7,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from prepare import *
+from shared import *
 
 class DatasetDefinition:
     def __init__(self) -> None:

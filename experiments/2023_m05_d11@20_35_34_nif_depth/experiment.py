@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from torchWork import LossWeightTree
 
-from prepare import *
+from shared import *
 from hyper_params import *
 from exp_group import ExperimentGroup
 

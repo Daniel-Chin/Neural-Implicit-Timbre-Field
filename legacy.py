@@ -17,7 +17,7 @@ from yin import yin
 from harmonicSynth import HarmonicSynth, Harmonic
 from blindDescend import blindDescend
 
-from prepare import *
+from shared import *
 
 def selfRecon(f0s, timbres):
     hS = HarmonicSynth(

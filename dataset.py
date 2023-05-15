@@ -13,7 +13,7 @@ with ImportDanPy():
     from harmonicSynth import Harmonic
     from yin import yin
 
-from prepare import *
+from shared import *
 from dataset_definitions import DatasetDefinition
 
 class MyDataset(Dataset):

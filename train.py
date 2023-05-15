@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader, Dataset
 import torchWork
 from torchWork import runExperiment, Profiler, LossLogger, saveModels, HAS_CUDA, loadExperiment
 
-from prepare import *
+from shared import *
 from losses import Loss_root
 from hyper_params import HyperParams
 from arg_parser import ArgParser

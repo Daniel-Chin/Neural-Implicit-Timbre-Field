@@ -22,7 +22,7 @@ with ImportDanPy():
     from harmonicSynth import HarmonicSynth, Harmonic
     from selectAudioDevice import selectAudioDevice
 
-from prepare import *
+from shared import *
 from exp_group import ExperimentGroup
 from nitf import NITF
 from dataset import MyDataset
