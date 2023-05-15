@@ -7,6 +7,7 @@ import torch
 from torchWork import loadExperiment, DEVICE
 from torchWork.experiment_control import EXPERIMENT_PY_FILENAME
 from matplotlib import pyplot as plt
+from tqdm import tqdm
 
 from shared import *
 from exp_group import ExperimentGroup
@@ -26,7 +27,7 @@ def main():
 
         dataset: MyDataset = experiment.dataset
         
-        for group in groups:
+        for group in tqdm(groups):
             print(group.name())
             # for rand_init_i in range(n_rand_inits):
             rand_init_i = 0
@@ -41,6 +42,12 @@ def main():
                         break
                     print(f'{epoch = }')
                     evalOne(nitf, dataset, group.hyperParams)
+                    # plt.show()
+                    plt.savefig(path.join(
+                        EXP_PATH, 
+                        group.pathName(), 
+                        f'spectrogram_{epoch}.png', 
+                    ))
 
 def evalOne(nitf: NITF, dataset: MyDataset, hParams):
     fig, axes = plt.subplots(2, 1, sharex=True)
@@ -48,7 +55,7 @@ def evalOne(nitf: NITF, dataset: MyDataset, hParams):
     times = dataset.times[TIME_SLICE]
     data = dataset.X.T[:, TIME_SLICE]
     vmax = data.max()
-    print('plot 0...')
+    # print('plot 0...')
     axes[0].pcolormesh(
         times, dataset.freqs, data, 
         vmin=0, vmax=vmax, 
@@ -56,12 +63,12 @@ def evalOne(nitf: NITF, dataset: MyDataset, hParams):
     axes[0].set_title('Ground truth')
     axes[0].set_xlabel('Time (sec)')
     axes[0].set_ylabel('Freq (Hz)')
-    print('forward...')
+    # print('forward...')
     x_hat = forwardF0IsLatent(
         nitf, dataset, hParams, dataset.I[TIME_SLICE], 
         batch_size_override=len(times),
     )
-    print('plot 1...')
+    # print('plot 1...')
     pcm = axes[1].pcolormesh(
         times, dataset.freqs, x_hat.T, 
         vmin=0, vmax=vmax, 
@@ -70,7 +77,6 @@ def evalOne(nitf: NITF, dataset: MyDataset, hParams):
     axes[1].set_xlabel('Time (sec)')
     axes[1].set_ylabel('Freq (Hz)')
     fig.colorbar(pcm, ax=axes)
-    plt.show()
 
 if __name__ == '__main__':
     main()

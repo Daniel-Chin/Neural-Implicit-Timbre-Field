@@ -1,5 +1,6 @@
 from os import path
 from typing import *
+from itertools import count
 
 import numpy as np
 import torch
@@ -33,28 +34,36 @@ def main():
             f0 = yin(page, SR, PAGE_LEN)
             yin_t.append(i * PAGE_LEN / SR)
             yin_f0.append(f0)
-        plt.plot(yin_t, yin_f0, linewidth=.5, label='YIN')
         
-        for group in groups:
-            kw = dict(label=group.name())
-            # for rand_init_i in range(n_rand_inits):
-            rand_init_i = 0
-            if True:
-                nitf = loadNITFForEval(
-                    EXP_PATH, experiment.datasetDef, 
-                    group, rand_init_i, None, 
-                )
-                plt.plot(
-                    dataset.times, 
-                    nitf.f0_latent, 
-                    linewidth=.5, 
-                    **kw, 
-                )
-                kw.clear()
+    def f():
+        for epoch in count():
+            print(f'{epoch = }')
+            plt.plot(yin_t, yin_f0, linewidth=.5, label='YIN')
+            for group in groups:
+                kw = dict(label=group.name())
+                # for rand_init_i in range(n_rand_inits):
+                rand_init_i = 0
+                if True:
+                    try:
+                        nitf = loadNITFForEval(
+                            EXP_PATH, experiment.datasetDef, 
+                            group, rand_init_i, epoch, 
+                        )
+                    except FileNotFoundError:
+                        return
+                    plt.plot(
+                        dataset.times, 
+                        nitf.f0_latent, 
+                        linewidth=.5, 
+                        **kw, 
+                    )
+                    kw.clear()
+            # plt.yscale('log')
+            plt.legend()
+            plt.show()
         
-        plt.yscale('log')
-        plt.legend()
-        plt.show()
+    with torch.no_grad():
+        f()
 
 if __name__ == '__main__':
     main()
