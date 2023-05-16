@@ -88,7 +88,7 @@ def oneEpoch(
     
     saveModels(models, epoch, save_path)
     if epoch < 4 or (epoch ** .5).is_integer():
-        print(group_name, 'epoch', epoch, 'finished.')
+        print(group_name, 'epoch', epoch, 'finished.', flush=True)
         # print('last batch loss =', total_loss.item(), flush=True)
     
     return True
