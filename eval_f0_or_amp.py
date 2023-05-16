@@ -18,7 +18,7 @@ from nitf import NITF
 from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 
-from workspace import EXP_PATH
+from workspace import EXP_PATH, EPOCHS
 
 def main():
     with torch.no_grad():
@@ -32,17 +32,25 @@ def main():
         truth_f0 = []
         truth_amp = []
         for i, page in enumerate(pagesOf(dataset.wav)):
-            f0 = yin(page, SR, PAGE_LEN)
+            f0 = yin(page, SR, PAGE_LEN, fmin=80, fmax=800)
             amp = np.sqrt(np.square(page).sum())
             truth_t.append(i * PAGE_LEN / SR)
             truth_f0.append(f0)
             truth_amp.append(amp)
         
     def f():
-        for epoch in count(step=10):
+        for epoch in EPOCHS:
             print(f'{epoch = }')
-            # plt.plot(truth_t, truth_f0, linewidth=.5, label='YIN')
-            # plt.plot(truth_t, truth_amp, linewidth=.5, label='Ground truth')
+            plt.plot(
+                truth_t, truth_f0, 
+                'o', linewidth=.5, markersize=.5, 
+                label='YIN', 
+            )
+            # plt.plot(
+            #     truth_t, truth_amp, 
+            #     'o', linewidth=.5, markersize=.5, 
+            #     label='Ground truth', 
+            # )
             for group in groups:
                 kw = dict(label=group.name())
                 # for rand_init_i in range(n_rand_inits):
@@ -57,9 +65,9 @@ def main():
                         return
                     plt.plot(
                         dataset.times, 
-                        nitf.dredge_freq, 
+                        nitf.dredge_freq * FREQ_SCALE, 
                         # nitf.amp_latent, 
-                        linewidth=.5, 
+                        'o', linewidth=.5, markersize=.5, 
                         **kw, 
                     )
                     kw.clear()
