@@ -38,6 +38,7 @@ def main():
             if True:
                 print(f'{rand_init_i = }')
                 X = []
+                final_f0 = None
                 for epoch in tqdm(count()):
                     try:
                         nitf = loadNITFForEval(
@@ -47,6 +48,8 @@ def main():
                     except FileNotFoundError:
                         break
                     X.append(nitf.dredge_confidence[VOICED_PAGE_I, :])
+                    final_f0 = nitf.dredge_freq[VOICED_PAGE_I].item() * FREQ_SCALE
+                print(f'{final_f0 = }')
                 X = torch.stack(X, dim=0).T
                 for i in range(DREDGE_LEN):
                     plt.plot(
