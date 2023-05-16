@@ -7,7 +7,7 @@ import librosa
 import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
-from torchWork import DEVICE
+from torchWork import DEVICE, HAS_CUDA
 
 from import_dan_py import ImportDanPy
 with ImportDanPy():
@@ -27,7 +27,8 @@ class MyDataset(Dataset):
         y, sr = librosa.load(datasetDef.wav_path, sr=SR)
         print('read wav ok')
         assert sr == SR
-        # y = y[:round(len(y) * .1)] # for debug
+        # for debug
+        # y = y[:round(len(y) * .1)]; assert not HAS_CUDA
         self.wav = y
 
         if datasetDef.is_f0_latent:

@@ -6,11 +6,12 @@ __all__ = [
 ]
 
 import torch
+from torchWork import DEVICE
 
 RATIOS = sorted([2, 3, 3/2])
 DREDGE_RADIUS = len(RATIOS)
 DREDGE_LEN = DREDGE_RADIUS * 2 + 1
-DREDGE_MULT = torch.ones((DREDGE_LEN, )).float()
+DREDGE_MULT = torch.ones((DREDGE_LEN, )).float().to(DEVICE)
 for i in range(DREDGE_RADIUS):
     DREDGE_MULT[DREDGE_RADIUS - i - 1] = 1 / RATIOS[i]
     DREDGE_MULT[DREDGE_RADIUS + i + 1] = RATIOS[i]
