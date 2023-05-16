@@ -100,7 +100,7 @@ def batchF0NotLatent(
         x, nitf.vowel_embs[page_i, :], 
     ), dim=1)
     y_hat = nitf.forward(nitf_in)
-    lossTree.harmonics = F.mse_loss(y_hat[:, 0], y)
+    lossTree.harmonics = F.mse_loss(y_hat[:, 0], y).cpu()
 
 @lru_cache()
 def getFreqCube(batch_size, n_freq_bins):
@@ -159,10 +159,10 @@ def batchF0IsLatent(
     x, page_i, 
 ):
     x_hat = forwardF0IsLatent(nitf, dataset, hParams, page_i)
-    lossTree.harmonics = F.mse_loss(x_hat, x)
+    lossTree.harmonics = F.mse_loss(x_hat, x).cpu()
     lossTree.dredge_regularize = regularizeDredge(
         nitf.dredge_confidence[page_i, :], 
-    )
+    ).cpu()
 
 if __name__ == '__main__':
     main()
