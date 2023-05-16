@@ -32,6 +32,7 @@ GROUPS = []
 template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('harmonics', 1, None), 
+    LossWeightTree('dredge_regularize', 0, None), 
 ])
 template.lr = 1e-3
 template.weight_decay = 1e-9

@@ -32,6 +32,7 @@ GROUPS = []
 template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('harmonics', 1, None), 
+    LossWeightTree('dredge_regularize', 1e-6, None), 
 ])
 template.lr = 1e-3
 template.weight_decay = 1e-9
@@ -39,7 +40,7 @@ template.optim_name = 'adam'
 template.nif_width = 128
 template.nif_depth = 6
 template.n_vowel_dims = 2
-template.batch_size = 256
+template.batch_size = 512
 template.max_epoch = 10000
 
 for xxx in []:

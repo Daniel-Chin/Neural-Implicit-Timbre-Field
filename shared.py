@@ -23,7 +23,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import scipy.signal
 
-FREQ_SCALE = 1e3
+FREQ_SCALE = 1e2
 
 PAGE_LEN = 256
 SR = 11025

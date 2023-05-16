@@ -10,5 +10,6 @@ class Loss_root(LossTree):
         super().__init__()
         self.name = 'loss_root'
         self.harmonics: float = None
-        self.children = ['harmonics', ]
+        self.dredge_regularize: float = None
+        self.children = ['harmonics', 'dredge_regularize', ]
 

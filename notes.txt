@@ -75,6 +75,10 @@ Stretched partials:
 reverb:
     important? no? 
 
+about unpitched component:
+    maybe a NIF? sensitive to timing, but insensitive (add noise) to freq? 
+    but maybe not important. See if the unpitched component messes up the pitched component. 
+
 experiments
     polyphonies
     2 vocals with instruments

@@ -17,6 +17,7 @@ AbstractLossNode = loss_tree.AbstractLossNode
 def main():
     absLossRoot = AbstractLossNode('loss_root', [
         'harmonics', 
+        'dredge_regularize', 
     ])
     with open('losses.py', 'w') as f:
         loss_tree.writeCode(f, absLossRoot)

@@ -12,7 +12,7 @@ from dataset import MyDataset
 from dataset_definitions import danF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
-EXP_NAME = 'f0_is_latent'
+EXP_NAME = 'dredge_test'
 N_RAND_INITS = 1
 dataset = MyDataset(datasetDef)
 
@@ -32,6 +32,7 @@ GROUPS = []
 template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('harmonics', 1, None), 
+    LossWeightTree('dredge_regularize', 1e-6, None), 
 ])
 template.lr = 1e-3
 template.weight_decay = 1e-9
@@ -39,7 +40,7 @@ template.optim_name = 'adam'
 template.nif_width = 128
 template.nif_depth = 6
 template.n_vowel_dims = 2
-template.batch_size = 256
+template.batch_size = 512
 template.max_epoch = 10000
 
 for nif_depth in [3, 4, 5, 6, 7]:

@@ -27,6 +27,7 @@ class MyDataset(Dataset):
         y, sr = librosa.load(datasetDef.wav_path, sr=SR)
         print('read wav ok')
         assert sr == SR
+        # y = y[:round(len(y) * .1)] # for debug
         self.wav = y
 
         if datasetDef.is_f0_latent:

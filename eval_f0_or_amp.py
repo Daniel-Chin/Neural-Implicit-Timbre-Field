@@ -57,7 +57,7 @@ def main():
                         return
                     plt.plot(
                         dataset.times, 
-                        nitf.f0_latent, 
+                        nitf.dredge_freq, 
                         # nitf.amp_latent, 
                         linewidth=.5, 
                         **kw, 
