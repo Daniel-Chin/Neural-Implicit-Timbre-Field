@@ -40,7 +40,7 @@ template.optim_name = 'adam'
 template.nif_width = 128
 template.nif_depth = 6
 template.n_vowel_dims = 2
-template.batch_size = 512
+template.batch_size = 256
 template.max_epoch = 10000
 
 for xxx in []:
