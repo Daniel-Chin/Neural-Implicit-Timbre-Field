@@ -34,3 +34,8 @@ dF = DatasetDefinition()
 dF.wav_path = './dataset/yanhe.wav'
 dF.is_f0_latent = True
 heF0IsLatent = dF
+
+dF = DatasetDefinition()
+dF.wav_path = './dataset/voice_scale.wav'
+dF.is_f0_latent = True
+voiceScaleF0IsLatent = dF

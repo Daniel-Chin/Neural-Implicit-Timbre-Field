@@ -1,6 +1,7 @@
 DL todo
     decrease LR
     MSE on spectrogram means grad on per-page latents aren't normalized as batch_size changes. 
+    voice embedding distribution visualize: remove unpitched pages
 
 amplitude inductive bias
     at first, i thought: assume most amplitude to be 0. Like a lasso loss. 

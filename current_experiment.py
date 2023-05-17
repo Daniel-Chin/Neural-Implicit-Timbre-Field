@@ -9,10 +9,10 @@ from hyper_params import *
 from exp_group import ExperimentGroup
 from dataset import MyDataset
 
-from dataset_definitions import danF0IsLatent as datasetDef
+from dataset_definitions import voiceScaleF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
-EXP_NAME = 'dredge_test'
+EXP_NAME = 'voice_scale'
 N_RAND_INITS = 1
 dataset = MyDataset(datasetDef)
 
@@ -43,7 +43,7 @@ template.n_vowel_dims = 2
 template.batch_size = 256
 template.max_epoch = 10000
 
-for nif_depth in [3, 4, 5, 6, 7]:
+for nif_depth in [4, 5, 6, 7]:
     hP = deepcopy(template)
     hP.nif_depth = nif_depth
     hP.ready(globals())
