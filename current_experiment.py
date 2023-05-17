@@ -43,7 +43,7 @@ template.n_vowel_dims = 2
 template.batch_size = 256
 template.max_epoch = 10000
 
-for nif_depth in [4, 5, 6, 7]:
+for nif_depth in [5, 6, 7]:
     hP = deepcopy(template)
     hP.nif_depth = nif_depth
     hP.ready(globals())
