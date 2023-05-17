@@ -135,12 +135,14 @@ def forwardF0IsLatent(
     # ve is (batch_size, DREDGE_LEN, N_HARMONICS, n_vowel_dims)
     dredge_confidence = dredge_confidence.unsqueeze(2).repeat(1, 1, N_HARMONICS)
     # dredge_confidence is (batch_size, DREDGE_LEN, N_HARMONICS)
-    nitf_in = torch.concat((
-        freq.unsqueeze(3), 
-        f0  .unsqueeze(3), 
-        amp .unsqueeze(3), 
-        ve, 
-    ), dim=3)
+    nitf_in = [        freq.unsqueeze(3)]
+    if hParams.nif_sees_f0:
+        nitf_in.append(f0  .unsqueeze(3))
+    if hParams.nif_sees_amp:
+        nitf_in.append(amp .unsqueeze(3))
+    if hParams.nif_sees_vowel:
+        nitf_in.append(ve)
+    nitf_in = torch.concat(nitf_in, dim=3)
     mag = nitf.forward(nitf_in)[:, :, :, 0]
     freqCube = getFreqCube(
         batch_size, dataset.n_freq_bins, 

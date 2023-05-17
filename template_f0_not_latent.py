@@ -40,6 +40,9 @@ template.optim_name = 'adam'
 template.nif_width = 128
 template.nif_depth = 6
 template.n_vowel_dims = 2
+template.nif_sees_f0 = True
+template.nif_sees_amp = True
+template.nif_sees_vowel = True
 template.batch_size = 2 ** 12
 template.max_epoch = 10000
 
