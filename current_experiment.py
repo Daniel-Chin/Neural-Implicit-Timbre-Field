@@ -10,7 +10,7 @@ from exp_group import ExperimentGroup
 from dataset import MyDataset
 
 from dataset_definitions import voiceScaleF0IsLatent as datasetDef
-SLOW_EVAL_EPOCH_INTERVAL = 32
+SLOW_EVAL_EPOCH_INTERVAL = 128
 
 EXP_NAME = 'voice_scale'
 N_RAND_INITS = 1

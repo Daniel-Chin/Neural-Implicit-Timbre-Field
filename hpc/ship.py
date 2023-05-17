@@ -3,6 +3,13 @@
 import os
 from os import path
 import subprocess as sp
+import sys
+
+try:
+    TAKE_EVERY = int(sys.argv[1])
+    print(f'{TAKE_EVERY = }')
+except:
+    TAKE_EVERY = 1
 
 def main():
     os.chdir('../experiments')
@@ -59,12 +66,14 @@ def tar(exp_dir_name):
                 max_epoch = -1
                 for name in os.listdir(path.join(*paths)):
                     eat(name)
-                    # if not name.startswith(prefix):
-                    #     eat(name)
-                    #     continue
-                    # _, name = name.split(prefix)
-                    # name, _ = name.split(suffix)
-                    # epoch = int(name)
+                    if not name.startswith(prefix):
+                        eat(name)
+                        continue
+                    _, name = name.split(prefix)
+                    name, _ = name.split(suffix)
+                    epoch = int(name)
+                    if epoch % TAKE_EVERY == 0:
+                        eat(name)
                     # max_epoch = max(max_epoch, epoch)
                 # assert max_epoch != -1
                 # eat(template % max_epoch)
