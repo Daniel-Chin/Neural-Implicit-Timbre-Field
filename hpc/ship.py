@@ -65,7 +65,6 @@ def tar(exp_dir_name):
                 paths.append(name)
                 max_epoch = -1
                 for name in os.listdir(path.join(*paths)):
-                    # eat(name)
                     if not name.startswith(prefix):
                         eat(name)
                         continue

@@ -20,7 +20,7 @@ from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 from dredge import *
 
-from workspace import EXP_PATH, EPOCHS, VOICED_PAGE_I
+from workspace import EXP_PATH, EPOCHS, VOICED_PAGE_I, TAKE_EVERY
 
 def main():
     with torch.no_grad():
@@ -39,7 +39,7 @@ def main():
                 print(f'{rand_init_i = }')
                 X = []
                 final_f0 = None
-                for epoch in tqdm(count()):
+                for epoch in tqdm(count(step=TAKE_EVERY)):
                     try:
                         nitf = loadNITFForEval(
                             EXP_PATH, experiment.datasetDef, 
