@@ -1,6 +1,5 @@
 DL todo
     decrease LR
-    MSE on spectrogram means grad on per-page latents aren't normalized as batch_size changes. 
     voice embedding distribution visualize: remove unpitched pages
 
 amplitude inductive bias
@@ -80,6 +79,11 @@ reverb:
 about unpitched component:
     maybe a NIF? sensitive to timing, but insensitive (add noise) to freq? 
     but maybe not important. See if the unpitched component messes up the pitched component. 
+
+about MSE vs sum
+    at first, i thourhg: 
+        MSE on spectrogram means grad on per-page latents aren't normalized as batch_size changes. 
+    but actually, Adam is agonistic to a linear scaling of the grad, I think 
 
 experiments
     polyphonies

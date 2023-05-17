@@ -18,7 +18,7 @@ from nitf import NITF
 from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 
-from workspace import EXP_PATH, EPOCHS
+from workspace import EXP_PATH, EPOCHS, SELECT_GROUPS, TIME_SLICE
 
 def main():
     with torch.no_grad():
@@ -51,7 +51,7 @@ def main():
             #     'o', linewidth=.5, markersize=.5, 
             #     label='Ground truth', 
             # )
-            for group in groups:
+            for group in groups[SELECT_GROUPS]:
                 kw = dict(label=group.name())
                 # for rand_init_i in range(n_rand_inits):
                 rand_init_i = 0

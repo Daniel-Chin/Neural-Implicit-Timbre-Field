@@ -10,7 +10,7 @@ from exp_group import ExperimentGroup
 from dataset import MyDataset
 
 from dataset_definitions import voiceScaleF0IsLatent as datasetDef
-SLOW_EVAL_EPOCH_INTERVAL = 1
+SLOW_EVAL_EPOCH_INTERVAL = 32
 
 EXP_NAME = 'voice_scale'
 N_RAND_INITS = 1
@@ -41,7 +41,7 @@ template.nif_width = 128
 template.nif_depth = 6
 template.n_vowel_dims = 2
 template.batch_size = 256
-template.max_epoch = 10000
+template.max_epoch = 1e5
 
 for nif_depth in [5, 6, 7]:
     hP = deepcopy(template)
