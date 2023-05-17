@@ -7,7 +7,7 @@ import sys
 
 try:
     TAKE_EVERY = int(sys.argv[1])
-    print(f'{TAKE_EVERY = }')
+    print('TAKE_EVERY =', TAKE_EVERY)
 except:
     TAKE_EVERY = 1
 
