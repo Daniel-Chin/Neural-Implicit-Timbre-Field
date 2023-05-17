@@ -73,7 +73,7 @@ def tar(exp_dir_name):
                     name, _ = name.split(suffix)
                     epoch = int(name)
                     if epoch % TAKE_EVERY == 0:
-                        eat(name)
+                        eat(template % epoch)
                     # max_epoch = max(max_epoch, epoch)
                 # assert max_epoch != -1
                 # eat(template % max_epoch)
