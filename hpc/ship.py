@@ -61,7 +61,7 @@ def tar(exp_dir_name):
             else:
                 if name == '__pycache__':
                     continue
-                # print('  doing', name)
+                print('  doing', name)
                 paths.append(name)
                 max_epoch = -1
                 for name in os.listdir(path.join(*paths)):
@@ -72,7 +72,9 @@ def tar(exp_dir_name):
                     name, _ = name.split(suffix)
                     epoch = int(name)
                     if epoch % TAKE_EVERY == 0:
-                        eat(template % epoch)
+                        name = template % epoch
+                        print('  doing', name)
+                        eat(name)
                     # max_epoch = max(max_epoch, epoch)
                 # assert max_epoch != -1
                 # eat(template % max_epoch)
