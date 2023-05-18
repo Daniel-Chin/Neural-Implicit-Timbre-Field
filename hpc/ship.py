@@ -5,6 +5,8 @@ from os import path
 import subprocess as sp
 import sys
 
+from tqdm import tqdm
+
 try:
     TAKE_EVERY = int(sys.argv[1])
     print('TAKE_EVERY =', TAKE_EVERY)
@@ -61,10 +63,12 @@ def tar(exp_dir_name):
             else:
                 if name == '__pycache__':
                     continue
-                print('  doing', name)
+                # print('  doing', name)
                 paths.append(name)
                 max_epoch = -1
-                for name in os.listdir(path.join(*paths)):
+                for name in tqdm(
+                    [*os.listdir(path.join(*paths))], name, 
+                ):
                     if not name.startswith(prefix):
                         eat(name)
                         continue
@@ -73,7 +77,7 @@ def tar(exp_dir_name):
                     epoch = int(name)
                     if epoch % TAKE_EVERY == 0:
                         name = template % epoch
-                        print('  doing', name)
+                        # print('  doing', name)
                         eat(name)
                     # max_epoch = max(max_epoch, epoch)
                 # assert max_epoch != -1
