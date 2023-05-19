@@ -29,6 +29,7 @@ C = [*zip(R, G, B)]
 C[DREDGE_RADIUS] = 'k'
 
 def main():
+    print(f'{SELECT_PAGE = }')
     with torch.no_grad():
         exp_name, n_rand_inits, groups, experiment = loadExperiment(path.join(
             EXP_PATH, EXPERIMENT_PY_FILENAME, 

@@ -39,7 +39,7 @@ def main():
             truth_amp.append(amp)
         
     def f():
-        for epoch in EPOCHS:
+        for epoch in EPOCHS(experiment):
             print(f'{epoch = }')
             plt.plot(
                 truth_t, truth_f0, 

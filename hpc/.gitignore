@@ -1,3 +1,4 @@
 *.out
 *.err
 auto.sbatch
+ship_out.txt

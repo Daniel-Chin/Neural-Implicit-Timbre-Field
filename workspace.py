@@ -15,11 +15,11 @@ def EPOCHS(experiment):
     # start = 25000
     step = experiment.SLOW_EVAL_EPOCH_INTERVAL
     # step = 128
-    return count(start, step)
+    return count(round(start / step) * step, step)
 
 # TIME_SLICE = slice(None)
 TIME_SLICE = slice(0, 256)
-SELECT_PAGE = round(.25 * SR / PAGE_LEN)
-# SELECT_PAGE = round(1.35 * SR / PAGE_LEN)
+SELECT_PAGE = round(.25 * SR / PAGE_LEN * 2)
+# SELECT_PAGE = round(1.35 * SR / PAGE_LEN * 2)
 SELECT_GROUPS = slice(None)
 # SELECT_GROUPS = slice(-1, None)
