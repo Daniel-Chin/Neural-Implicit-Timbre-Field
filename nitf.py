@@ -84,7 +84,7 @@ class NITF(nn.Module):
             old_max, i = old.max(dim=1)
             where = old_max / old[:, DREDGE_RADIUS] >= 2
             i_where = i[where]
-            self.dredge_confidence[where, :].fill_(0)
+            self.dredge_confidence[where, :] = 0
             self.dredge_confidence[where, DREDGE_RADIUS] = old[where, i_where]
             self.dredge_confidence[where, DREDGE_RADIUS * 2 - i_where] = old[where, DREDGE_RADIUS]
             self.dredge_confidence.grad[where, :] = 0
