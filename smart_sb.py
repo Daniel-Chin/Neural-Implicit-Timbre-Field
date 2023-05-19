@@ -21,6 +21,7 @@ def getExpName(experiment_py_path: str):
 def main():
     args = ArgParser()
     exp_name = getExpName(args.exp_py_path)
+    print('exp_name =', exp_name)
 
     t = datetime.now().strftime('%Y_m%m_d%d@%H_%M_%S')
     user = os.getenv('USER')
