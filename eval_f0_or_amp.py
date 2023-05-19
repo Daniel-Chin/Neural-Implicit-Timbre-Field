@@ -43,7 +43,9 @@ def main():
             print(f'{epoch = }')
             plt.plot(
                 truth_t, truth_f0, 
-                'o', linewidth=.5, markersize=.5, 
+                'o', 
+                markersize=8, markerfacecolor='none', 
+                markeredgewidth=.5, 
                 label='YIN', 
             )
             # plt.plot(
@@ -51,7 +53,7 @@ def main():
             #     'o', linewidth=.5, markersize=.5, 
             #     label='Ground truth', 
             # )
-            for group in groups[SELECT_GROUPS]:
+            for group_i, group in enumerate(groups[SELECT_GROUPS]):
                 kw = dict(label=group.name())
                 # for rand_init_i in range(n_rand_inits):
                 rand_init_i = 0
@@ -67,7 +69,9 @@ def main():
                         dataset.times, 
                         nitf.dredge_freq * FREQ_SCALE, 
                         # nitf.amp_latent, 
-                        'o', linewidth=.5, markersize=.5, 
+                        'xv^s.'[group_i], 
+                        markersize=6, markerfacecolor='none', 
+                        markeredgewidth=.5, 
                         **kw, 
                     )
                     kw.clear()
