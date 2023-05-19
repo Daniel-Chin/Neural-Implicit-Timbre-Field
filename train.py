@@ -86,7 +86,8 @@ def oneEpoch(
     if epoch % 16 == 0:
         nitf.simplifyDredge(optim)
     
-    saveModels(models, epoch, save_path)
+    if epoch % experiment.SLOW_EVAL_EPOCH_INTERVAL == 0:
+        saveModels(models, epoch, save_path)
     if epoch < 4 or (epoch ** .5).is_integer():
         print(group_name, 'epoch', epoch, 'finished.', flush=True)
         # print('last batch loss =', total_loss.item(), flush=True)

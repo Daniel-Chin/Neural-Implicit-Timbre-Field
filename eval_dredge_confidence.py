@@ -20,7 +20,7 @@ from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 from dredge import *
 
-from workspace import EXP_PATH, EPOCHS, VOICED_PAGE_I, TAKE_EVERY
+from workspace import EXP_PATH, EPOCHS, SELECT_PAGE, TAKE_EVERY
 
 def main():
     with torch.no_grad():
@@ -47,8 +47,8 @@ def main():
                         )
                     except FileNotFoundError:
                         break
-                    X.append(nitf.dredge_confidence[VOICED_PAGE_I, :])
-                    final_f0 = nitf.dredge_freq[VOICED_PAGE_I].item() * FREQ_SCALE
+                    X.append(nitf.dredge_confidence[SELECT_PAGE, :])
+                    final_f0 = nitf.dredge_freq[SELECT_PAGE].item() * FREQ_SCALE
                 print(f'{final_f0 = }')
                 X = torch.stack(X, dim=0).T
                 for i in range(DREDGE_LEN):

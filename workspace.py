@@ -10,13 +10,16 @@ EXP_PATH = path.join('./experiments/',
 '''
 .strip())
 
-TAKE_EVERY = 128
+def EPOCHS(experiment):
+    start = 0
+    # start = 25000
+    step = experiment.SLOW_EVAL_EPOCH_INTERVAL
+    # step = 128
+    return count(start, step)
 
 # TIME_SLICE = slice(None)
 TIME_SLICE = slice(0, 256)
-# EPOCHS = count()
-# EPOCHS = range(100, 110)
-EPOCHS = count(((25000 // TAKE_EVERY) * TAKE_EVERY), 256)
-VOICED_PAGE_I = 8000 // PAGE_LEN
+SELECT_PAGE = round(.25 * SR / PAGE_LEN)
+# SELECT_PAGE = round(1.35 * SR / PAGE_LEN)
 SELECT_GROUPS = slice(None)
 # SELECT_GROUPS = slice(-1, None)
