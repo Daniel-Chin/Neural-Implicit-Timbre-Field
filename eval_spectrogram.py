@@ -31,7 +31,7 @@ def main():
             # for rand_init_i in range(n_rand_inits):
             rand_init_i = 0
             if True:
-                for epoch in EPOCHS:
+                for epoch in EPOCHS(experiment):
                     try:
                         nitf = loadNITFForEval(
                             EXP_PATH, experiment.datasetDef, 

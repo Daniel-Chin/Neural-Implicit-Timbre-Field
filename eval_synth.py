@@ -412,6 +412,7 @@ def inference(
 ):
     nitf = nitfContainer[0]
     group = groups[group_selection.get()]
+    hParams = group.hyperParams
     n_vowel_dims = group.hyperParams.n_vowel_dims
     ve_mean = nitf.vowel_embs.mean(dim=0)
     ve_std  = nitf.vowel_embs.std(dim=0)
@@ -421,18 +422,18 @@ def inference(
         ve[1] += ve_std[1] * vowel_emb_zscore_1.get()
     ve = ve.float()
 
-    X = torch.stack((
-        freqs, 
-        torch.ones_like(freqs) * f0, 
-        torch.ones_like(freqs) * amp.get(), 
-    ), dim=1)
-    X_vowel = torch.concat((
-        dataset.transformX(X), 
-        ve.unsqueeze(0).repeat(X.shape[0], 1), 
-    ), dim=1)
-    mag = dataset.retransformY(
-        nitf.forward(X_vowel), 
-    )
+    X = [freqs / FREQ_SCALE]
+    if hParams.nif_sees_f0:
+        X.append(torch.ones_like(freqs) * f0 / FREQ_SCALE)
+    if hParams.nif_sees_amp:
+        X.append(torch.ones_like(freqs) * amp.get())
+    X = torch.stack(X, dim=1)
+    if hParams.nif_sees_vowel:
+        X = torch.concat((
+            X, 
+            ve.unsqueeze(0).repeat(X.shape[0], 1), 
+        ), dim=1)
+    mag = nitf.forward(X)
     return mag
 
 def main():

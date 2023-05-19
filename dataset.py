@@ -44,8 +44,7 @@ class MyDataset(Dataset):
             X = torch.tensor(np.abs(Zxx)).T.float().contiguous()
             self.n_pages = len(self.times)
 
-            self.X_std = X.std(dim=0)
-            X = X / self.X_std
+            X = X / X.std(dim=0)
 
             self.X = X.to(DEVICE).contiguous()
             self.I = torch.arange(
@@ -54,7 +53,7 @@ class MyDataset(Dataset):
         else:
             f0s, timbres, amps = self.getStreams(y)
             self.n_pages = len(f0s)
-            self.initF0IsLatent(f0s, timbres, amps)
+            self.initF0NotLatent(f0s, timbres, amps)
         
         print('dataset ok')
 
@@ -68,7 +67,7 @@ class MyDataset(Dataset):
             desc='extract timbre', 
         ):
             # spectrum = spectrogram[:, page_i]
-            spectrum = np.abs(rfft(page * HANN)) / PAGE_LEN
+            spectrum = np.abs(rfft(page * HANN)) / (PAGE_LEN / 2)
             f0 = yin(
                 page, SR, PAGE_LEN, 
                 fmin=pitch2freq(36), 
@@ -94,7 +93,7 @@ class MyDataset(Dataset):
                 len(spectrum_2) - bins_taken
             )
             harmonics_a_2[harmonics_a_2 < 2 * mean_bin_noise] = 0
-            harmonics_a = np.sqrt(harmonics_a_2)
+            harmonics_a = np.sqrt(harmonics_a_2) / WINDOW_ENERGY
 
             harmonics = [
                 Harmonic(f, a) for (f, a) in zip(
@@ -112,7 +111,7 @@ class MyDataset(Dataset):
         
         return f0s, timbres, amps
 
-    def initF0IsLatent(
+    def initF0NotLatent(
         self, f0s, timbres: List[List[Harmonic]], amps, 
     ):
         I = []
@@ -124,7 +123,7 @@ class MyDataset(Dataset):
             page_X = []
             for harmonic in harmonics:
                 page_X.append(torch.tensor((
-                    harmonic.freq, f0, amp, 
+                    harmonic.freq / FREQ_SCALE, f0 / FREQ_SCALE, amp, 
                 )))
                 Y.append(harmonic.mag)
                 I.append(page_i)
@@ -137,26 +136,10 @@ class MyDataset(Dataset):
         Y = torch.tensor(Y).float().to(DEVICE).contiguous()
         I = torch.tensor(I, dtype=torch.long).to(DEVICE).contiguous()
 
-        self.X_mean = X.mean(dim=0)
-        X = X - self.X_mean
-        self.X_std = X.std(dim=0)
-        X = X / self.X_std
-
-        self.Y_mean = Y.mean(dim=0)
-        Y = Y - self.Y_mean
-        self.Y_std = Y.std(dim=0)
-        Y = Y / self.Y_std
-
         self.X = X
         self.Y = Y
         self.I = I
     
-    def transformX(self, x):
-        return (x - self.X_mean) / self.X_std
-    
-    def retransformY(self, y):
-        return y * self.Y_std + self.Y_mean
-
     def __len__(self):
         return self.X.shape[0]
 
