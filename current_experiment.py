@@ -12,16 +12,16 @@ from dataset import MyDataset
 from dataset_definitions import voiceScaleF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 128
 
-EXP_NAME = 'nitf_sees_not'
-N_RAND_INITS = 1
+EXP_NAME = 'nif_abs_out'
+N_RAND_INITS = 2
 dataset = MyDataset(datasetDef)
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'nif_depth'
-        self.variable_value = hyperParams.nif_depth
+        self.variable_name = 'nif_abs_out'
+        self.variable_value = hyperParams.nif_abs_out
     
     @lru_cache(1)
     def name(self):
@@ -43,11 +43,12 @@ template.n_vowel_dims = 2
 template.nif_sees_f0 = False
 template.nif_sees_amp = False
 template.nif_sees_vowel = False
+template.nif_abs_out = True
 template.batch_size = 256
 template.max_epoch = 1e5
 
-for nif_depth in [5, 6, 7]:
+for nif_abs_out in [False, True]:
     hP = deepcopy(template)
-    hP.nif_depth = nif_depth
+    hP.nif_abs_out = nif_abs_out
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

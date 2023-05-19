@@ -15,6 +15,8 @@ class NITF(nn.Module):
         self, hParams: HyperParams, is_vocal: bool = True, 
     ) -> None:
         super().__init__()
+
+        self.hParams = hParams
         layers = []
         in_dim = 1
         if hParams.nif_sees_f0:
@@ -75,7 +77,10 @@ class NITF(nn.Module):
         return chain(super().parameters(), self.buffers())
     
     def forward(self, /, x: torch.Tensor) -> torch.Tensor:
-        return self.sequential(x)
+        x = self.sequential(x)
+        if self.hParams.nif_abs_out:
+            x = x.abs()
+        return x
     
     def simplifyDredge(self, optim: torch.optim.Optimizer):
         optim.state.clear()

@@ -43,6 +43,7 @@ template.n_vowel_dims = 2
 template.nif_sees_f0 = True
 template.nif_sees_amp = True
 template.nif_sees_vowel = True
+template.nif_abs_out = False
 template.batch_size = 256
 template.max_epoch = 10000
 

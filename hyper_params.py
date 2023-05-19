@@ -24,6 +24,7 @@ class HyperParams(BaseHyperParams):
         self.nif_sees_f0: bool = None
         self.nif_sees_amp: bool = None
         self.nif_sees_vowel: bool = None
+        self.nif_abs_out: bool = None
 
         self.batch_size: int = None
         # self.grad_clip: Optional[float] = None
