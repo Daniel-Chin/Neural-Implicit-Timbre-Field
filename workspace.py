@@ -6,7 +6,7 @@ from shared import *
 
 EXP_PATH = path.join('./experiments/',
 '''
-2023_m05_d19@03_10_28_nitf_sees_not
+2023_m05_d20@09_17_00_not_latent
 '''
 .strip())
 
@@ -15,7 +15,9 @@ def EPOCHS(experiment):
     start = 20000
     step = experiment.SLOW_EVAL_EPOCH_INTERVAL
     # step = 128
-    return count(round(start / step) * step, step)
+    real_start = round(start / step) * step
+    return count(real_start, step)
+    # return range(real_start, real_start + step * 4, step)
 
 # TIME_SLICE = slice(None)
 TIME_SLICE = slice(0, 256)

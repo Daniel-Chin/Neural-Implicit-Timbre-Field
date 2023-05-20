@@ -28,7 +28,7 @@ from nitf import NITF
 from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 
-from workspace import EXP_PATH
+from workspace import EXP_PATH, EPOCHS
 
 PLOT_MAX_FPS = 10
 PLOT_RESOLUTION = 200
@@ -132,7 +132,7 @@ class RightFrame(tk.Frame):
                 ax.axhline(y=0, c='k', linewidth=.5)
                 ax.set_xlabel('frequency (Hz)')
                 ax.set_ylabel('envelope')
-                ax.set_ylim(bottom=-.001, top=.01)
+                # ax.set_ylim(bottom=-.001, top=.01)
                 self.ax = ax
 
                 global anim
@@ -159,7 +159,7 @@ class RightFrame(tk.Frame):
                     self.vowel_emb_zscore_1, 
                 )
                 self.line2D.set_ydata(mag)
-                # self.ax.set_ylim(bottom=mag.min(), top=mag.max())
+                self.ax.set_ylim(bottom=mag.min()-.01, top=mag.max()+.01)
 
                 self.fig.tight_layout()
                 # self.throttle = time() + PLOT_MAX_SPF
@@ -422,9 +422,9 @@ def inference(
         ve[1] += ve_std[1] * vowel_emb_zscore_1.get()
     ve = ve.float()
 
-    X = [freqs / FREQ_SCALE]
+    X = [freqNorm(freqs)]
     if hParams.nif_sees_f0:
-        X.append(torch.ones_like(freqs) * f0 / FREQ_SCALE)
+        X.append(freqNorm(torch.ones_like(freqs) * f0))
     if hParams.nif_sees_amp:
         X.append(torch.ones_like(freqs) * amp.get())
     X = torch.stack(X, dim=1)
@@ -433,7 +433,7 @@ def inference(
             X, 
             ve.unsqueeze(0).repeat(X.shape[0], 1), 
         ), dim=1)
-    mag = nitf.forward(X)
+    mag = nitf.forward(X)[:, 0]
     return mag
 
 def main():
@@ -460,6 +460,8 @@ def main():
         vowel_emb_zscore_0 = tk.DoubleVar(root, 0)
         vowel_emb_zscore_1 = tk.DoubleVar(root, 0)
         nitfContainer = [None]
+
+        epoch.set(next(EPOCHS(experiment)))
 
         def refreshNITF(*_):
             global plotVowels

@@ -45,10 +45,10 @@ class NITF(nn.Module):
             self.register_buffer('saved_vowel_embs', self.vowel_embs)
         
         if datasetDef.is_f0_latent:
-            self.dredge_freq = torch.ones(
+            self.dredge_freq = freqNorm(torch.ones(
                 (dataset.n_pages, ), 
                 device=DEVICE, 
-            ).float() * 200 / FREQ_SCALE
+            ).float() * 200)
             self.dredge_freq.requires_grad = True
             self.register_buffer(
                 'saved_dredge_freq', self.dredge_freq, 

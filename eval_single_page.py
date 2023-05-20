@@ -65,7 +65,7 @@ def main():
                         print(epoch, e)
                         break
                     confidences.append(nitf.dredge_confidence[SELECT_PAGE, :])
-                    freqs      .append(nitf.dredge_freq      [SELECT_PAGE].item() * FREQ_SCALE)
+                    freqs.append(freqDenorm(nitf.dredge_freq[SELECT_PAGE].item()))
                     epochs.append(epoch)
                 print('final f0 is', freqs[-1])
                 confidences = torch.stack(confidences, dim=0).T

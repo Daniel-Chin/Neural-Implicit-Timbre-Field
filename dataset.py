@@ -89,10 +89,12 @@ class MyDataset(Dataset):
                         pass
                     else:
                         bins_taken += 1
-            mean_bin_noise = (spectrum_2.sum() - harmonics_a_2.sum()) / (
-                len(spectrum_2) - bins_taken
-            )
-            harmonics_a_2[harmonics_a_2 < 2 * mean_bin_noise] = 0
+            n_noise_bins = len(spectrum_2) - bins_taken
+            if n_noise_bins != 0:
+                mean_bin_noise = (
+                    spectrum_2.sum() - harmonics_a_2.sum()
+                ) / n_noise_bins
+                harmonics_a_2[harmonics_a_2 < 2 * mean_bin_noise] = 0
             harmonics_a = np.sqrt(harmonics_a_2) / WINDOW_ENERGY
 
             harmonics = [
@@ -107,7 +109,7 @@ class MyDataset(Dataset):
                 harmonics.append(Harmonic(freq, 0))
             f0s.append(f0)
             timbres.append(harmonics)
-            amps.append(np.sqrt(spectrum_2.sum()))
+            amps.append(np.sqrt(np.square(page).mean()))
         
         return f0s, timbres, amps
 
@@ -123,7 +125,7 @@ class MyDataset(Dataset):
             page_X = []
             for harmonic in harmonics:
                 page_X.append(torch.tensor((
-                    harmonic.freq / FREQ_SCALE, f0 / FREQ_SCALE, amp, 
+                    freqNorm(harmonic.freq), freqNorm(f0), amp, 
                 )))
                 Y.append(harmonic.mag)
                 I.append(page_i)

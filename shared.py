@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 __all__ = [
-    'FREQ_SCALE', 
     'PAGE_LEN', 
     'SR', 
     'DTYPE', 
@@ -16,6 +15,8 @@ __all__ = [
     'freq2pitch', 
     'pagesOf', 
     'plotUnstretchedPartials', 
+    'freqNorm', 
+    'freqDenorm', 
 ]
 
 from typing import *
@@ -23,8 +24,6 @@ from typing import *
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy.signal
-
-FREQ_SCALE = 1e2
 
 PAGE_LEN = 256
 SR = 11025
@@ -44,7 +43,7 @@ def pitch2freq(pitch):
 def freq2pitch(f):
     return np.log(f) * 17.312340490667562 - 36.37631656229591
 
-def pagesOf(signal):
+def pagesOf(signal: np.ndarray):
     for i in range(0, signal.size - PAGE_LEN + 1, PAGE_LEN):
         yield signal[i : i + PAGE_LEN]
 
@@ -52,3 +51,11 @@ def plotUnstretchedPartials(f0, n_partials = 14, color = 'r', alpha = .3):
     for i in range(1, n_partials + 1):
         freq = f0 * i
         plt.axvline(x = freq, color = color, alpha = alpha)
+
+def freqNorm(freq):
+    return (freq - 200) * 1e-2
+# violates DRY. Change together!
+def freqDenorm(freq):
+    return freq * 1e2 + 200
+a = np.random.randn(100)
+assert (np.abs(freqNorm(freqDenorm(a)) - a) < 1e-6).all()

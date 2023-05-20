@@ -15,7 +15,7 @@ from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 from train import forwardF0IsLatent
 
-from workspace import EXP_PATH, TIME_SLICE, EPOCHS
+from workspace import EXP_PATH, TIME_SLICE, EPOCHS, SELECT_GROUPS
 
 def main():
     with torch.no_grad():
@@ -26,7 +26,7 @@ def main():
 
         dataset: MyDataset = experiment.dataset
         
-        for group in tqdm(groups):
+        for group in tqdm(groups[SELECT_GROUPS]):
             print(group.name())
             # for rand_init_i in range(n_rand_inits):
             rand_init_i = 0

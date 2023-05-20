@@ -48,7 +48,7 @@ def main():
                     except FileNotFoundError:
                         break
                     X.append(nitf.dredge_confidence[SELECT_PAGE, :])
-                    final_f0 = nitf.dredge_freq[SELECT_PAGE].item() * FREQ_SCALE
+                    final_f0 = freqDenorm(nitf.dredge_freq[SELECT_PAGE].item())
                 print(f'{final_f0 = }')
                 X = torch.stack(X, dim=0).T
                 for i in range(DREDGE_LEN):

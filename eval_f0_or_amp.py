@@ -67,7 +67,7 @@ def main():
                         return
                     plt.plot(
                         dataset.times, 
-                        nitf.dredge_freq * FREQ_SCALE, 
+                        freqDenorm(nitf.dredge_freq), 
                         # nitf.amp_latent, 
                         'xv^s.'[group_i], 
                         markersize=6, markerfacecolor='none', 
