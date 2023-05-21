@@ -9,10 +9,10 @@ from hyper_params import *
 from exp_group import ExperimentGroup
 from dataset import MyDataset
 
-from dataset_definitions import danF0NotLatent as datasetDef
-SLOW_EVAL_EPOCH_INTERVAL = 1
+from dataset_definitions import voiceScaleF0IsLatent as datasetDef
+SLOW_EVAL_EPOCH_INTERVAL = 128
 
-EXP_NAME = 'not_latent'
+EXP_NAME = 'nif_abs_out'
 N_RAND_INITS = 2
 dataset = MyDataset(datasetDef)
 
@@ -32,7 +32,7 @@ GROUPS = []
 template = HyperParams()
 template.lossWeightTree = LossWeightTree('total', 1, [
     LossWeightTree('harmonics', 1, None), 
-    LossWeightTree('dredge_regularize', 0, None), 
+    LossWeightTree('dredge_regularize', 1e-6, None), 
 ])
 template.lr = 1e-3
 template.weight_decay = 1e-9
@@ -40,12 +40,12 @@ template.optim_name = 'adam'
 template.nif_width = 128
 template.nif_depth = 6
 template.n_vowel_dims = 2
-template.nif_sees_f0 = True
-template.nif_sees_amp = True
-template.nif_sees_vowel = True
-template.nif_abs_out = False
-template.batch_size = 2 ** 12
-template.max_epoch = 10000
+template.nif_sees_f0 = False
+template.nif_sees_amp = False
+template.nif_sees_vowel = False
+template.nif_abs_out = True
+template.batch_size = 256
+template.max_epoch = 1e5
 
 for nif_abs_out in [False, True]:
     hP = deepcopy(template)
