@@ -48,6 +48,8 @@ template.ground_truth_f0 = False
 template.batch_size = 256
 template.max_epoch = 1e5
 
+template.ground_truth_f0 = True
+
 for nif_abs_out in [False, True]:
     hP = deepcopy(template)
     hP.nif_abs_out = nif_abs_out

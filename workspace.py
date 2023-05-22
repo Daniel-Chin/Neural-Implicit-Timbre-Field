@@ -6,7 +6,7 @@ from shared import *
 
 EXP_PATH = path.join('./experiments/',
 '''
-2023_m05_d21@17_36_34_nif_abs_out
+2023_m05_d21@22_55_03_ground_truth_f0
 '''
 .strip())
 
