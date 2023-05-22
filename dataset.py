@@ -54,7 +54,7 @@ class MyDataset(Dataset):
             f0s = []
             for time in times:
                 n = round(time * SR)
-                page = y[n * PAGE_LEN : (n + 1) * PAGE_LEN]
+                page = y[n : n + PAGE_LEN]
                 page = np.pad(page, (0, PAGE_LEN - len(page)))
                 f0s.append(yin(
                     page, SR, PAGE_LEN, 
