@@ -26,6 +26,8 @@ class HyperParams(BaseHyperParams):
         self.nif_sees_vowel: bool = None
         self.nif_abs_out: bool = None
 
+        self.ground_truth_f0: bool = None
+
         self.batch_size: int = None
         # self.grad_clip: Optional[float] = None
         self.optim_name: str = None

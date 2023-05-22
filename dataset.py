@@ -50,6 +50,18 @@ class MyDataset(Dataset):
             self.I = torch.arange(
                 0, self.n_pages, dtype=torch.long, 
             ).to(DEVICE).contiguous()
+
+            f0s = []
+            for time in times:
+                n = round(time * SR)
+                page = y[n * PAGE_LEN : (n + 1) * PAGE_LEN]
+                page = np.pad(page, (0, PAGE_LEN - len(page)))
+                f0s.append(yin(
+                    page, SR, PAGE_LEN, 
+                    fmin=pitch2freq(36), 
+                    fmax=pitch2freq(84), 
+                ))
+            self.f0s = torch.tensor(f0s).float().to(DEVICE).contiguous()
         else:
             f0s, timbres, amps = self.getStreams(y)
             self.n_pages = len(f0s)

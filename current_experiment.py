@@ -12,7 +12,7 @@ from dataset import MyDataset
 from dataset_definitions import voiceScaleF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 128
 
-EXP_NAME = 'nif_abs_out'
+EXP_NAME = 'ground_truth_f0'
 N_RAND_INITS = 2
 dataset = MyDataset(datasetDef)
 
@@ -43,7 +43,8 @@ template.n_vowel_dims = 2
 template.nif_sees_f0 = False
 template.nif_sees_amp = False
 template.nif_sees_vowel = False
-template.nif_abs_out = True
+template.nif_abs_out = False
+template.ground_truth_f0 = False
 template.batch_size = 256
 template.max_epoch = 1e5
 

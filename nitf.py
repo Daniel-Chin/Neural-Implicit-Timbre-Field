@@ -45,14 +45,17 @@ class NITF(nn.Module):
             self.register_buffer('saved_vowel_embs', self.vowel_embs)
         
         if datasetDef.is_f0_latent:
-            self.dredge_freq = freqNorm(torch.ones(
-                (dataset.n_pages, ), 
-                device=DEVICE, 
-            ).float() * 200)
-            self.dredge_freq.requires_grad = True
-            self.register_buffer(
-                'saved_dredge_freq', self.dredge_freq, 
-            )
+            if hParams.ground_truth_f0:
+                self.dredge_freq = freqNorm(dataset.f0s)
+            else:
+                self.dredge_freq = freqNorm(torch.ones(
+                    (dataset.n_pages, ), 
+                    device=DEVICE, 
+                ).float() * 200)
+                self.dredge_freq.requires_grad = True
+                self.register_buffer(
+                    'saved_dredge_freq', self.dredge_freq, 
+                )
 
             self.dredge_confidence = torch.zeros(
                 (dataset.n_pages, DREDGE_LEN), 

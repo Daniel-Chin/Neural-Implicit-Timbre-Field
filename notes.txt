@@ -1,6 +1,6 @@
 DL todo
-    decrease LR
     voice embedding distribution visualize: remove unpitched pages
+    abs dredge_confidence
 
 amplitude inductive bias
     at first, i thought: assume most amplitude to be 0. Like a lasso loss. 
