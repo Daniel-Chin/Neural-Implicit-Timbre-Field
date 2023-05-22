@@ -86,6 +86,8 @@ class NITF(nn.Module):
         return x
     
     def simplifyDredge(self, optim: torch.optim.Optimizer):
+        if self.hParams.ground_truth_f0:
+            return
         optim.state.clear()
         with torch.no_grad():
             old = self.dredge_confidence.clone()
