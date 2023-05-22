@@ -6,13 +6,13 @@ from shared import *
 
 EXP_PATH = path.join('./experiments/',
 '''
-2023_m05_d19@21_21_44_not_latent
+2023_m05_d21@17_36_34_nif_abs_out
 '''
 .strip())
 
 def EPOCHS(experiment):
     # start = 0
-    start = 80
+    start = 25000
     step = experiment.SLOW_EVAL_EPOCH_INTERVAL
     # step = 128
     real_start = round(start / step) * step

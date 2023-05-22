@@ -461,7 +461,7 @@ def main():
         vowel_emb_zscore_1 = tk.DoubleVar(root, 0)
         nitfContainer = [None]
 
-        epoch.set(next(EPOCHS(experiment)))
+        epoch.set(str(next(EPOCHS(experiment))))
 
         def refreshNITF(*_):
             global plotVowels

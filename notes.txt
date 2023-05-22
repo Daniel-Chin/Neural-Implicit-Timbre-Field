@@ -94,3 +94,8 @@ experiments
     bird chirps
         bird "vowel" spave
         source seperate
+
+TIMELINE
+5/22
+    2023_m05_d19@21_21_44_not_latent
+    freqNorm and eval_synth are working properly. Next, f0 is latent. 
