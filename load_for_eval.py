@@ -16,8 +16,8 @@ def loadNITFForEval(
     nitf.eval()
     nitf.vowel_embs = nitf.get_buffer('saved_vowel_embs')
     if datasetDef.is_f0_latent:
-        nitf.dredge_confidence = nitf.get_buffer('saved_dredge_confidence')
         nitf.amp_latent        = nitf.get_buffer('saved_amp_latent')
         if not nitf.hParams.ground_truth_f0:
             nitf.dredge_freq       = nitf.get_buffer('saved_dredge_freq')
+            nitf.dredge_confidence = nitf.get_buffer('saved_dredge_confidence')
     return nitf
