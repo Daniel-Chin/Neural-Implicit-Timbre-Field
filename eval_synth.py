@@ -36,6 +36,7 @@ POINT_RADIUS = 2
 VOWEL_SPACE_Z_RADIUS = 3
 
 DTYPE_PA = pyaudio.paFloat32
+MASTER_VOLUME = 1e-3
 
 plotVowels = None   # violates MVC
 anim = None
@@ -398,7 +399,7 @@ class AudioStreamer:
                     mag[partial_i].item(), 
                 ))
             self.hS.eat(harmonics)
-            return self.hS.mix(), pyaudio.paContinue
+            return self.hS.mix() * MASTER_VOLUME, pyaudio.paContinue
 
 def inference(
     freqs: torch.Tensor, f0, 

@@ -36,7 +36,7 @@ def main():
         ))
         print(f'{exp_name = }')
 
-        assert next(EPOCHS(experiment)) == 0
+        assert next(iter(EPOCHS(experiment))) == 0
         dataset: MyDataset = experiment.dataset
         
         t = dataset.times[SELECT_PAGE].item()

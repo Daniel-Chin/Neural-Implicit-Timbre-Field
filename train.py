@@ -125,6 +125,8 @@ def forwardF0IsLatent(
     batch_size = batch_size_override or hParams.batch_size
     dredge_freq = freqDenorm(nitf.dredge_freq[page_i])
     dredge_confidence = nitf.dredge_confidence[page_i, :]
+    if hParams.nif_abs_confidence:
+        dredge_confidence = dredge_confidence.abs()
     amp = nitf.amp_latent[page_i]
     ve  = nitf.vowel_embs[page_i, :]
 

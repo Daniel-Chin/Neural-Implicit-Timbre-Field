@@ -6,18 +6,18 @@ from shared import *
 
 EXP_PATH = path.join('./experiments/',
 '''
-2023_m05_d22@06_01_45_ground_truth_f0
+2023_m05_d23@01_00_19_ground_truth_f0_and_conf
 '''
 .strip())
 
 def EPOCHS(experiment):
-    # start = 0
-    start = 40000
-    step = experiment.SLOW_EVAL_EPOCH_INTERVAL
-    # step = 128
+    start = 0
+    # start = 25000
+    # step = experiment.SLOW_EVAL_EPOCH_INTERVAL
+    step = 256
     real_start = round(start / step) * step
     # return count(real_start, step)
-    return range(real_start, real_start + step * 4, step)
+    return range(real_start, real_start + step * 8, step)
 
 # TIME_SLICE = slice(None)
 TIME_SLICE = slice(0, 256)

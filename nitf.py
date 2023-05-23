@@ -91,6 +91,8 @@ class NITF(nn.Module):
             return
         optim.state.clear()
         with torch.no_grad():
+            if self.hParams.nif_abs_confidence:
+                self.dredge_confidence = self.dredge_confidence.abs()
             old = self.dredge_confidence.clone()
             old_max, i = old.max(dim=1)
             where = old_max / old[:, DREDGE_RADIUS] >= 2

@@ -28,9 +28,9 @@ def main():
         
         for group in tqdm(groups[SELECT_GROUPS]):
             print(group.name())
-            # for rand_init_i in range(n_rand_inits):
-            rand_init_i = 0
-            if True:
+            for rand_init_i in range(n_rand_inits):
+            # rand_init_i = 0
+            # if True:
                 for epoch in EPOCHS(experiment):
                     try:
                         nitf = loadNITFForEval(
@@ -56,7 +56,8 @@ def evalOne(nitf: NITF, dataset: MyDataset, hParams):
     axes = fig.subplots(2, 1, sharex=True)
     axes: List[plt.Axes] = axes.tolist()
     times = dataset.times[TIME_SLICE]
-    data = dataset.X.T[:, TIME_SLICE].log()
+    data = dataset.X.T[:, TIME_SLICE]
+    # data = data.log()
     vmin = data.min()
     vmax = data.max()
     # print('plot 0...')
@@ -73,8 +74,10 @@ def evalOne(nitf: NITF, dataset: MyDataset, hParams):
         batch_size_override=len(times),
     )
     # print('plot 1...')
+    data_1 = x_hat.T.clip(1e-8)
+    # data_1 = data_1.log()
     pcm = axes[1].pcolormesh(
-        times, dataset.freqs, x_hat.T.clip(1e-8).log(), 
+        times, dataset.freqs, data_1, 
         vmin=vmin, vmax=vmax, 
     )
     axes[1].set_title('Recon')
