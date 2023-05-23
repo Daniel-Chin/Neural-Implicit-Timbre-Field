@@ -39,9 +39,10 @@ def main():
         assert next(EPOCHS(experiment)) == 0
         dataset: MyDataset = experiment.dataset
         
+        t = dataset.times[SELECT_PAGE].item()
         audio= dataset.wav[
-            PAGE_LEN * SELECT_PAGE : 
-            PAGE_LEN * (SELECT_PAGE + 1)
+            round(t * SR) : 
+            round(t * SR) + PAGE_LEN
         ]
         yin_f0 = yin(audio, SR, PAGE_LEN)
         print(f'{yin_f0 = }')
