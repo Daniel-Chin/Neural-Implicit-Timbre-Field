@@ -13,7 +13,7 @@ from dataset_definitions import voiceScaleF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
 EXP_NAME = 'multi_page'
-N_RAND_INITS = 2
+N_RAND_INITS = 1
 dataset = MyDataset(datasetDef)
 
 class MyExpGroup(ExperimentGroup):

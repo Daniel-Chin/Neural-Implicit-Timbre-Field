@@ -27,7 +27,7 @@ class MyDataset(Dataset):
         y, sr = librosa.load(datasetDef.wav_path, sr=SR)
         print('read wav ok')
         assert sr == SR
-        # for debug
+        # for debug. Beware n_batch=0
         # y = y[:round(len(y) * .1)]; assert not HAS_CUDA
         self.wav = y
 
