@@ -77,8 +77,8 @@ class NITF(nn.Module):
                 'saved_amp_latent', self.amp_latent, 
             )
     
-    def parameters(self):
-        return chain(super().parameters(), self.buffers())
+    def fastParameters(self):
+        return self.buffers()
     
     def forward(self, /, x: torch.Tensor) -> torch.Tensor:
         x = self.sequential(x)
@@ -103,3 +103,8 @@ class NITF(nn.Module):
             self.dredge_confidence.grad[where, :] = 0
             self.dredge_freq[where] = freqNorm(freqDenorm(self.dredge_freq[where]) * DREDGE_MULT[i_where])
             self.dredge_freq.grad[where] = 0
+    
+    def renormConfidence(self):
+        with torch.no_grad():
+            self.dredge_confidence[self.dredge_confidence < 0] = 0
+            self.dredge_confidence /= self.dredge_confidence.norm(1, dim=1, keepdim=True)

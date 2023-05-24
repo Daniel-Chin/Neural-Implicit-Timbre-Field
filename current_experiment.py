@@ -12,7 +12,7 @@ from dataset import MyDataset
 from dataset_definitions import voiceScaleF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 128
 
-EXP_NAME = 'abs_abs'
+EXP_NAME = 'multi_page'
 N_RAND_INITS = 2
 dataset = MyDataset(datasetDef)
 
@@ -48,6 +48,8 @@ template.nif_sees_amp = False
 template.nif_sees_vowel = False
 template.nif_abs_out = False
 template.nif_abs_confidence = False
+template.nif_renorm_confidence = True
+template.nif_fast_lr = 2e-2
 template.ground_truth_f0 = False
 template.batch_size = 256
 template.max_epoch = 1e5

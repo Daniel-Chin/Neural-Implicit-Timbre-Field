@@ -26,6 +26,8 @@ class HyperParams(BaseHyperParams):
         self.nif_sees_vowel: bool = None
         self.nif_abs_out: bool = None
         self.nif_abs_confidence: bool = None
+        self.nif_renorm_confidence: bool = None
+        self.nif_fast_lr: float = None
 
         self.ground_truth_f0: bool = None
 

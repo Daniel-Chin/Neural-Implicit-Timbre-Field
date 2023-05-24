@@ -67,6 +67,9 @@ def oneEpoch(
         trainSet, hParams.batch_size, shuffle=True, 
         drop_last=True, 
     )
+    fastOptim = torch.optim.Adam(
+        nitf.fastParameters(), hParams.nif_fast_lr, 
+    )
     for batch_i, batch in enumerate(dataLoader):
         lossTree = Loss_root()
         if datasetDef.is_f0_latent:
@@ -74,9 +77,13 @@ def oneEpoch(
         else:
             batchF0NotLatent(lossTree, hParams, nitf, *batch)
         optim.zero_grad()
+        fastOptim.zero_grad()
         total_loss = lossTree.sum(hParams.lossWeightTree, epoch)
         total_loss.backward()
         optim.step()
+        fastOptim.step()
+        if hParams.nif_renorm_confidence:
+            nitf.renormConfidence()
 
         lossLogger.eat(
             epoch, batch_i, True, profiler, lossTree, 
@@ -84,7 +91,7 @@ def oneEpoch(
         )
 
     if trainSet.datasetDef.is_f0_latent and epoch % 16 == 0:
-        nitf.simplifyDredge(optim)
+        nitf.simplifyDredge(fastOptim)
     
     if epoch % experiment.SLOW_EVAL_EPOCH_INTERVAL == 0:
         saveModels(models, epoch, save_path)
