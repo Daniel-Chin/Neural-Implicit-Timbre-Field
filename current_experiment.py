@@ -10,7 +10,7 @@ from exp_group import ExperimentGroup
 from dataset import MyDataset
 
 from dataset_definitions import voiceScaleF0IsLatent as datasetDef
-SLOW_EVAL_EPOCH_INTERVAL = 128
+SLOW_EVAL_EPOCH_INTERVAL = 1
 
 EXP_NAME = 'multi_page'
 N_RAND_INITS = 2
@@ -55,6 +55,7 @@ template.batch_size = 256
 template.max_epoch = 1e5
 
 template.lossWeightTree['dredge_regularize'].weight = 1e-5
+template.nif_fast_lr = 1e-2
 
 for a in [False, True]:
     hP = deepcopy(template)
