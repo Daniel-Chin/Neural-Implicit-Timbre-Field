@@ -106,5 +106,8 @@ class NITF(nn.Module):
     
     def renormConfidence(self):
         with torch.no_grad():
-            self.dredge_confidence = self.dredge_confidence.abs()
+            where = self.dredge_confidence < 0
+            mask = torch.ones_like(self.dredge_confidence)
+            mask[where] = -1
+            self.dredge_confidence *= mask
             self.dredge_confidence /= self.dredge_confidence.norm(1, dim=1, keepdim=True)
