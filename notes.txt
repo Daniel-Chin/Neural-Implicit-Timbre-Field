@@ -1,6 +1,7 @@
 DL todo
-    voice embedding distribution visualize: remove unpitched pages
-    abs dredge_confidence
+    eval_synth voice embedding distribution visualize: remove unpitched pages
+    dredge_confidence projected GD
+    diff-LR optims. dredge_confidence needs faster stepping. 
 
 amplitude inductive bias
     at first, i thought: assume most amplitude to be 0. Like a lasso loss. 

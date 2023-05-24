@@ -53,9 +53,9 @@ def plotUnstretchedPartials(f0, n_partials = 14, color = 'r', alpha = .3):
         plt.axvline(x = freq, color = color, alpha = alpha)
 
 def freqNorm(freq):
-    return (freq - 200) * 1e-2
+    return (freq - 200) * 1e-3
 # violates DRY. Change together!
 def freqDenorm(freq):
-    return freq * 1e2 + 200
+    return freq * 1e3 + 200
 a = np.random.randn(100)
 assert (np.abs(freqNorm(freqDenorm(a)) - a) < 1e-6).all()

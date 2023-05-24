@@ -101,5 +101,5 @@ class NITF(nn.Module):
             self.dredge_confidence[where, DREDGE_RADIUS] = old[where, i_where]
             self.dredge_confidence[where, DREDGE_RADIUS * 2 - i_where] = old[where, DREDGE_RADIUS]
             self.dredge_confidence.grad[where, :] = 0
-            self.dredge_freq[where] = self.dredge_freq[where] * DREDGE_MULT[i_where]
+            self.dredge_freq[where] = freqNorm(freqDenorm(self.dredge_freq[where]) * DREDGE_MULT[i_where])
             self.dredge_freq.grad[where] = 0

@@ -52,6 +52,8 @@ template.ground_truth_f0 = False
 template.batch_size = 256
 template.max_epoch = 1e5
 
+template.lossWeightTree['dredge_regularize'].weight = 1e-5
+
 for a in [False, True]:
     hP = deepcopy(template)
     hP.nif_abs_out = a

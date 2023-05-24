@@ -49,9 +49,9 @@ def main():
         
         for group in groups:
             print(group.name())
-            # for rand_init_i in range(n_rand_inits):
-            rand_init_i = 0
-            if True:
+            for rand_init_i in range(n_rand_inits):
+            # rand_init_i = 0
+            # if True:
                 print(f'{rand_init_i = }')
                 confidences = []
                 freqs = []

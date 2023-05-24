@@ -4,3 +4,5 @@ experiments/**/losses.torchworklosslog
 experiments/**/spectr*.png
 *.pt
 *.gz
+playground/vid_out/
+playground/*.mp4

@@ -55,9 +55,9 @@ def main():
             # )
             for group_i, group in enumerate(groups[SELECT_GROUPS]):
                 kw = dict(label=group.name())
-                # for rand_init_i in range(n_rand_inits):
-                rand_init_i = 0
-                if True:
+                for rand_init_i in range(n_rand_inits):
+                # rand_init_i = 0
+                # if True:
                     try:
                         nitf = loadNITFForEval(
                             EXP_PATH, experiment.datasetDef, 
