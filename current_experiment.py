@@ -13,7 +13,7 @@ from dataset_definitions import voiceScaleF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
 EXP_NAME = 'fast_lr'
-N_RAND_INITS = 1
+N_RAND_INITS = 6
 dataset = MyDataset(datasetDef)
 
 class MyExpGroup(ExperimentGroup):
@@ -56,9 +56,15 @@ template.max_epoch = 1e5
 template.lossWeightTree['dredge_regularize'].weight = 1e-5
 template.nif_abs_out = True
 template.nif_abs_confidence = True
+template.nif_fast_lr = 2e-2
+template.max_epoch = 1e3
 
-for lr in [3e-4, 1e-3, 3e-3, 1e-2]:
-    hP = deepcopy(template)
-    template.nif_fast_lr = lr
-    hP.ready(globals())
-    GROUPS.append(MyExpGroup(hP))
+# for lr in [3e-4, 1e-3, 3e-3, 1e-2]:
+#     hP = deepcopy(template)
+#     hP.nif_fast_lr = lr
+#     hP.ready(globals())
+#     GROUPS.append(MyExpGroup(hP))
+
+hP = deepcopy(template)
+hP.ready(globals())
+GROUPS.append(MyExpGroup(hP))
