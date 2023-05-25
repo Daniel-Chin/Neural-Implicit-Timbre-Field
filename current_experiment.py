@@ -12,17 +12,17 @@ from dataset import MyDataset
 from dataset_definitions import voiceScaleF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
-EXP_NAME = 'fast_lr'
-N_RAND_INITS = 6
+EXP_NAME = 'log_sample'
+N_RAND_INITS = 1
 dataset = MyDataset(datasetDef)
 
 class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'nif_fast_lr'
+        self.variable_name = '0'
         self.variable_value = (
-            hyperParams.nif_fast_lr, 
+            0, 
         )
     
     @lru_cache(1)
@@ -48,15 +48,18 @@ template.nif_sees_vowel = False
 template.nif_abs_out = False
 template.nif_abs_confidence = False
 template.nif_renorm_confidence = True
-template.nif_fast_lr = 2e-2
 template.ground_truth_f0 = False
 template.batch_size = 256
 template.max_epoch = 1e5
 
-template.lossWeightTree['dredge_regularize'].weight = 1e-5
+if DEBUG_CUT_CORNERS:
+    template.batch_size //= 8
+
+template.lossWeightTree['dredge_regularize'].weight = 1e-6
 template.nif_abs_out = True
 template.nif_abs_confidence = True
-template.nif_fast_lr = 2e-2
+template.latent_low_lr = 1e-3
+template.latent_high_lr = 1e-2
 template.max_epoch = 1e3
 
 # for lr in [3e-4, 1e-3, 3e-3, 1e-2]:

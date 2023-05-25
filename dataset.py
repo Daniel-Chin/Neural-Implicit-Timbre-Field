@@ -7,7 +7,7 @@ import librosa
 import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
-from torchWork import DEVICE, HAS_CUDA
+from torchWork import DEVICE
 
 from import_dan_py import ImportDanPy
 with ImportDanPy():
@@ -15,7 +15,9 @@ with ImportDanPy():
     from yin import yin
 
 from shared import *
-from dataset_definitions import DatasetDefinition
+from dataset_definitions import (
+    DatasetDefinition, voiceScaleF0IsLatent as datasetDef, 
+)
 
 class MyDataset(Dataset):
     def __init__(self, datasetDef: DatasetDefinition) -> None:
@@ -28,7 +30,8 @@ class MyDataset(Dataset):
         print('read wav ok')
         assert sr == SR
         # for debug. Beware n_batch=0
-        # y = y[:round(len(y) * .1)]; assert not HAS_CUDA
+        if DEBUG_CUT_CORNERS:
+            y = y[:round(len(y) * .1)]
         self.wav = y
 
         if datasetDef.is_f0_latent:
@@ -41,10 +44,10 @@ class MyDataset(Dataset):
             self.times = torch.tensor(times).float()
             self.n_freq_bins = len(freqs)
             self.one_over_freq_bin = 1 / self.freqs[1]
-            X = torch.tensor(np.abs(Zxx)).T.float().contiguous()
+            X = torch.tensor(np.abs(Zxx) / (PAGE_LEN / 2)).T.float().contiguous()
             self.n_pages = len(self.times)
 
-            X = X / X.std(dim=0)
+            X = X / X.max()
 
             self.X = X.to(DEVICE).contiguous()
             self.I = torch.arange(
@@ -169,3 +172,16 @@ class MyDataset(Dataset):
                 self.Y[index], 
                 self.I[index], 
             )
+
+def preview():
+    from matplotlib import pyplot as plt
+    dataset = MyDataset(datasetDef)
+    assert datasetDef.is_f0_latent
+    for i, time in tqdm([*enumerate(dataset.times)][10:]):
+        spectrum = dataset.X[i, :]
+        plt.plot(dataset.freqs, spectrum)
+        plt.title(f'Page {i} at {time:.3f} sec')
+        plt.show()
+
+if __name__ == '__main__':
+    preview()

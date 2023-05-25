@@ -36,6 +36,9 @@ class NITF(nn.Module):
         datasetDef: DatasetDefinition = hParams.experiment_globals['datasetDef']
         dataset: MyDataset = hParams.experiment_globals['dataset']
 
+        self.low_lr_latents = []
+        self.high_lr_latents = []
+
         if is_vocal:
             self.vowel_embs = torch.zeros(
                 (dataset.n_pages, hParams.n_vowel_dims), 
@@ -43,6 +46,7 @@ class NITF(nn.Module):
                 device=DEVICE, 
             )
             self.register_buffer('saved_vowel_embs', self.vowel_embs)
+            self.low_lr_latents.append(self.vowel_embs)
         
         if datasetDef.is_f0_latent:
             self.dredge_confidence = torch.zeros(
@@ -62,11 +66,13 @@ class NITF(nn.Module):
                 self.register_buffer(
                     'saved_dredge_freq', self.dredge_freq, 
                 )
+                self.low_lr_latents.append(self.dredge_freq)
 
                 self.dredge_confidence.requires_grad = True
                 self.register_buffer(
                     'saved_dredge_confidence', self.dredge_confidence, 
                 )
+                self.high_lr_latents.append(self.dredge_confidence)
 
             self.amp_latent = torch.ones(
                 (dataset.n_pages, ), 
@@ -76,9 +82,7 @@ class NITF(nn.Module):
             self.register_buffer(
                 'saved_amp_latent', self.amp_latent, 
             )
-    
-    def fastParameters(self):
-        return self.buffers()
+            self.low_lr_latents.append(self.amp_latent)
     
     def forward(self, /, x: torch.Tensor) -> torch.Tensor:
         x = self.sequential(x)

@@ -19,6 +19,7 @@ from dataset import MyDataset
 from exp_group import ExperimentGroup
 from lobe import getLobe
 from dredge import *
+from log_sample_page import logSamplePage
 
 def requireModelClasses(_):
     x = {}
@@ -67,8 +68,11 @@ def oneEpoch(
         trainSet, hParams.batch_size, shuffle=True, 
         drop_last=True, 
     )
+    slowOptim = torch.optim.Adam(
+        nitf.low_lr_latents, hParams.latent_low_lr, 
+    )
     fastOptim = torch.optim.Adam(
-        nitf.fastParameters(), hParams.nif_fast_lr, 
+        nitf.high_lr_latents, hParams.latent_high_lr, 
     )
     for batch_i, batch in enumerate(dataLoader):
         lossTree = Loss_root()
@@ -77,10 +81,12 @@ def oneEpoch(
         else:
             batchF0NotLatent(lossTree, hParams, nitf, *batch)
         optim.zero_grad()
+        slowOptim.zero_grad()
         fastOptim.zero_grad()
         total_loss = lossTree.sum(hParams.lossWeightTree, epoch)
         total_loss.backward()
         optim.step()
+        slowOptim.step()
         fastOptim.step()
         if hParams.nif_renorm_confidence:
             nitf.renormConfidence()
@@ -90,16 +96,23 @@ def oneEpoch(
             hParams.lossWeightTree, 
         )
 
-    if trainSet.datasetDef.is_f0_latent and epoch % 16 == 0:
-        nitf.simplifyDredge(fastOptim)
+    with torch.no_grad():
+        if trainSet.datasetDef.is_f0_latent and epoch % 16 == 0:
+            nitf.simplifyDredge(fastOptim)
+        
+        if epoch % experiment.SLOW_EVAL_EPOCH_INTERVAL == 0:
+            saveModels(models, epoch, save_path)
+        if epoch < 4 or (epoch ** .5).is_integer():
+            print(group_name, 'epoch', epoch, 'finished.', flush=True)
+            # print('last batch loss =', total_loss.item(), flush=True)
+        
+        if LOG_SAMPLE_PAGE and datasetDef.is_f0_latent:
+            logSamplePage(
+                epoch, nitf, hParams, trainSet, datasetDef, save_path, 
+                forwardF0IsLatent, 
+            )
     
-    if epoch % experiment.SLOW_EVAL_EPOCH_INTERVAL == 0:
-        saveModels(models, epoch, save_path)
-    if epoch < 4 or (epoch ** .5).is_integer():
-        print(group_name, 'epoch', epoch, 'finished.', flush=True)
-        # print('last batch loss =', total_loss.item(), flush=True)
-    
-    return True
+    return epoch <= hParams.max_epoch
 
 def batchF0NotLatent(
     lossTree: Loss_root, hParams: HyperParams, 

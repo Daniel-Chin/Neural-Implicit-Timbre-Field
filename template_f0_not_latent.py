@@ -51,6 +51,9 @@ template.ground_truth_f0 = None
 template.batch_size = 2 ** 12
 template.max_epoch = 10000
 
+if DEBUG_CUT_CORNERS:
+    template.batch_size //= 8
+
 for xxx in []:
     hP = deepcopy(template)
     hP.xxx = xxx

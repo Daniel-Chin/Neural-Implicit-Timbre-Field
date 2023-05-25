@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 __all__ = [
+    'DEBUG_CUT_CORNERS', 
+    'LOG_SAMPLE_PAGE', 
     'PAGE_LEN', 
     'SR', 
     'DTYPE', 
@@ -25,6 +27,14 @@ import torch
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy.signal
+from torchWork import HAS_CUDA
+
+DEBUG_CUT_CORNERS = False
+LOG_SAMPLE_PAGE = True
+
+if DEBUG_CUT_CORNERS:
+    assert not HAS_CUDA
+    print('DEBUG_CUT_CORNERS')
 
 PAGE_LEN = 256
 SR = 11025
@@ -56,7 +66,11 @@ def plotUnstretchedPartials(f0, n_partials = 14, color = 'r', alpha = .3):
 def freqNorm(freq):
     return (freq - 200) * 1e-3
 # violates DRY. Change together!
-def freqDenorm(freq):
-    return torch.abs(freq * 1e3 + 200)
-a = np.random.randn(100)
+def freqDenorm(emb):
+    x = emb * 1e3 + 200
+    try:
+        return torch.abs(x)
+    except TypeError:
+        return abs(x)
+a = torch.randn(100).abs()
 assert (np.abs(freqNorm(freqDenorm(a)) - a) < 1e-6).all()
