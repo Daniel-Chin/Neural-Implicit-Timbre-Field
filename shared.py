@@ -21,6 +21,7 @@ __all__ = [
 
 from typing import *
 
+import torch
 import numpy as np
 from matplotlib import pyplot as plt
 import scipy.signal
@@ -56,6 +57,6 @@ def freqNorm(freq):
     return (freq - 200) * 1e-3
 # violates DRY. Change together!
 def freqDenorm(freq):
-    return freq * 1e3 + 200
+    return torch.abs(freq * 1e3 + 200)
 a = np.random.randn(100)
 assert (np.abs(freqNorm(freqDenorm(a)) - a) < 1e-6).all()
