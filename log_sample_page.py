@@ -2,6 +2,7 @@ from os import path
 
 import torch
 from matplotlib import pyplot as plt
+from torchWork import DEVICE
 
 from shared import *
 from nitf import NITF
@@ -20,10 +21,10 @@ def logSamplePage(
     fig = plt.figure(figsize=(10, 5), num=1, clear=True)
     ax = fig.add_subplot()
     page_i = sample_page_lookup[datasetDef.wav_path]
-    spectrum = dataset.X[page_i, :]
+    spectrum = dataset.X[page_i, :].cpu()
     spectrum_hat: torch.Tensor = forwardF0IsLatent(
         nitf, dataset, hParams, torch.tensor([page_i]), 
-    )[0, :]
+    )[0, :].cpu()
     ax.set_xlabel('Freq (Hz)')
     ax.plot(dataset.freqs, spectrum, label='Ground truth')
     ax.plot(dataset.freqs, spectrum_hat, label='Recon')
@@ -31,15 +32,16 @@ def logSamplePage(
         pitch2freq(36), 
         NYQUIST, 
         1000, 
+        device=DEVICE, 
     )
     X = X.unsqueeze(1)
     Y = nitf.forward(freqNorm(X))
-    ax.plot(X, Y, label='NITF')
+    ax.plot(X.cpu(), Y.cpu(), label='NITF')
     f0 = freqDenorm(nitf.dredge_freq[page_i])
-    f0s = f0 * DREDGE_MULT
+    f0s = f0.cpu() * DREDGE_MULT.cpu()
     ax.vlines(
         f0s, ymin=0, 
-        ymax = nitf.dredge_confidence[page_i, :].abs() * SCALE_CONFIDENCE, 
+        ymax = nitf.dredge_confidence[page_i, :].cpu().abs() * SCALE_CONFIDENCE, 
         colors='k', label='Dredge', 
     )
     ax.legend()
