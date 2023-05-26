@@ -65,10 +65,14 @@ def tar(exp_dir_name):
                     continue
                 # print('  doing', name)
                 paths.append(name)
+                os.system('ffmpeg -r 30 -i ./sample_page_epoch_%d.png ./sample_page.mp4')
+                '''
                 max_epoch = -1
                 for name in tqdm(
                     [*os.listdir(path.join(*paths))], name, 
                 ):
+                    if 'sample_page_epoch_' in name:
+                        continue
                     if not name.startswith(prefix):
                         eat(name)
                         continue
@@ -82,6 +86,7 @@ def tar(exp_dir_name):
                     # max_epoch = max(max_epoch, epoch)
                 # assert max_epoch != -1
                 # eat(template % max_epoch)
+                '''
                 paths.pop(-1)
         p.stdin.close()
         # print('  waiting...')
