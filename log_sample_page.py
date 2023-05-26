@@ -10,7 +10,8 @@ from dataset import MyDataset
 from dataset_definitions import DatasetDefinition, sample_page_lookup
 from dredge import *
 
-SCALE_CONFIDENCE = .02
+Y_LIM = 1.0
+SCALE_CONFIDENCE = .5
 
 def logSamplePage(
     epoch, nitf: NITF, hParams, 
@@ -45,7 +46,7 @@ def logSamplePage(
         colors='k', label='Dredge', 
     )
     ax.legend()
-    # ax.set_ylim(0, .04)
+    ax.set_ylim(0, Y_LIM)
     ax.set_title(f'epoch {epoch}')
     fig.savefig(path.join(
         save_path, 
