@@ -67,7 +67,8 @@ def tar(exp_dir_name):
                 paths.append(name)
                 img_name = path.join(*paths, 'sample_page_epoch_%d.png')
                 vid_name = path.join(*paths, 'sample_page.mp4')
-                os.system(f'ffmpeg -r 30 -i "{img_name}" "{vid_name}"')
+                if path.isfile(img_name % 0):
+                    os.system(f'ffmpeg -r 30 -i "{img_name}" "{vid_name}"')
                 max_epoch = -1
                 for name in tqdm(
                     [*os.listdir(path.join(*paths))], name, 

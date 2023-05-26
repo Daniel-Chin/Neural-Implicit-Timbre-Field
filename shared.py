@@ -30,7 +30,7 @@ import scipy.signal
 from torchWork import HAS_CUDA
 
 DEBUG_CUT_CORNERS = False
-LOG_SAMPLE_PAGE = True
+LOG_SAMPLE_PAGE = False
 
 if DEBUG_CUT_CORNERS:
     assert not HAS_CUDA

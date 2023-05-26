@@ -399,7 +399,11 @@ class AudioStreamer:
                     mag[partial_i].item(), 
                 ))
             self.hS.eat(harmonics)
-            return self.hS.mix() * MASTER_VOLUME, pyaudio.paContinue
+            page_out = self.hS.mix() * MASTER_VOLUME
+            page_max = np.max(np.abs(page_out))
+            if page_max > .7:
+                print('Warning: audio max is large =', page_max)
+            return page_out, pyaudio.paContinue
 
 def inference(
     freqs: torch.Tensor, f0, 
