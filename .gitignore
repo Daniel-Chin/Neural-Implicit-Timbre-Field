@@ -3,6 +3,7 @@
 experiments/**/losses.torchworklosslog
 experiments/**/spectr*.png
 experiments/**/sample_page*.png
+experiments/**/sample_page.mp4
 *.pt
 *.gz
 playground/vid_out/
