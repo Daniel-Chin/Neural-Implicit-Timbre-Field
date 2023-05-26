@@ -67,6 +67,8 @@ def tar(exp_dir_name):
                 paths.append(name)
                 img_name = path.join(*paths, 'sample_page_epoch_%d.png')
                 vid_name = path.join(*paths, 'sample_page.mp4')
+                from console import console
+                console({**globals(), **locals()})
                 os.system(f'ffmpeg -r 30 -i {img_name} {vid_name}')
                 '''
                 max_epoch = -1
