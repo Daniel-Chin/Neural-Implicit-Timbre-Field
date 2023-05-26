@@ -1,3 +1,5 @@
 #!/bin/bash
 
-srun --time=1:00:00 --pty python3 ship.py $1 
+module purge
+source /scratch/$USER/py_env/symmEnv/select_images
+singularity exec --nv --overlay /scratch/$USER/py_env/$ENV_NAME/$OVERLAY:ro /scratch/work/public/singularity/$SINGULARITY srun --time=1:00:00 --pty python3 ship.py $1
