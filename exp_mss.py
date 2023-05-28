@@ -49,7 +49,7 @@ template.nif_abs_out = False
 template.nif_abs_confidence = False
 template.nif_renorm_confidence = True
 template.ground_truth_f0 = False
-template.batch_size = 256
+template.batch_size = 64
 template.max_epoch = 1e5
 
 if DEBUG_CUT_CORNERS:
