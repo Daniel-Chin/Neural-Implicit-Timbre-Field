@@ -8,3 +8,5 @@ experiments/**/sample_page.mp4
 *.gz
 playground/vid_out/
 playground/*.mp4
+dataset/URMP/
+dataset/URMP.zip
