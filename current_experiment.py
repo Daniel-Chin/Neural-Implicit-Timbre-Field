@@ -20,9 +20,9 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = '0'
+        self.variable_name = 'nif_abs_confidence'
         self.variable_value = (
-            0, 
+            nif_abs_confidence, 
         )
     
     @lru_cache(1)
