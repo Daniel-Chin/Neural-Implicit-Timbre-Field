@@ -29,7 +29,7 @@ from matplotlib import pyplot as plt
 import scipy.signal
 from torchWork import HAS_CUDA
 
-DEBUG_CUT_CORNERS = True
+DEBUG_CUT_CORNERS = False
 LOG_SAMPLE_PAGE = False
 
 if DEBUG_CUT_CORNERS:
