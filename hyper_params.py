@@ -17,6 +17,8 @@ class HyperParams(BaseHyperParams):
 
         self.nickname: Optional[str] = None
         
+        self.n_nifs: int = None
+
         self.nif_width: int = None
         self.nif_depth: int = None
         self.n_vowel_dims: int = None

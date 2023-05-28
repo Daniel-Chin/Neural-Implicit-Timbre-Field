@@ -4,6 +4,7 @@ import os
 from os import path
 import subprocess as sp
 import sys
+from itertools import count
 
 from tqdm import tqdm
 
@@ -65,9 +66,17 @@ def tar(exp_dir_name):
                     continue
                 # print('  doing', name)
                 paths.append(name)
-                img_name = path.join(*paths, 'sample_page_epoch_%d.png')
-                vid_name = path.join(*paths, 'sample_page.mp4')
-                if path.isfile(img_name % 0):
+                for nitf_i in count():
+                    img_name = path.join(
+                        *paths, 
+                        f'sample_page_nitf_{nitf_i}_epoch_%d.png', 
+                    )
+                    vid_name = path.join(
+                        *paths, 
+                        f'sample_page_nitf_{nitf_i}.mp4', 
+                    )
+                    if not path.isfile(img_name % 0):
+                        break
                     os.system(f'ffmpeg -r 30 -i "{img_name}" "{vid_name}"')
                 max_epoch = -1
                 for name in tqdm(

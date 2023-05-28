@@ -26,7 +26,7 @@ class MyDataset(Dataset):
         self.datasetDef = datasetDef
 
         print('read wav...')
-        y, sr = librosa.load(datasetDef.wav_path, sr=SR)
+        y, sr = librosa.load(datasetDef.wav_path, sr=SR, mono=True)
         print('read wav ok')
         assert sr == SR
         # for debug. Beware n_batch=0

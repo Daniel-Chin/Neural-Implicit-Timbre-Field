@@ -6,6 +6,7 @@ from functools import lru_cache
 import torch
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
+from torch.optim import Adam, Optimizer
 import torchWork
 from torchWork import runExperiment, Profiler, LossLogger, saveModels, HAS_CUDA, loadExperiment, DEVICE
 
@@ -21,9 +22,9 @@ from lobe import getLobe
 from dredge import *
 from log_sample_page import logSamplePage
 
-def requireModelClasses(_):
+def requireModelClasses(hParams: HyperParams):
     x = {}
-    x['nitf'] = (NITF, 1)
+    x['nitf'] = (NITF, hParams.n_nifs)
     return x
 
 def main():
@@ -62,34 +63,37 @@ def oneEpoch(
     save_path: str, trainer_id: int, 
 ):
     datasetDef: DatasetDefinition = experiment.datasetDef
-    nitf: NITF = models['nitf'][0]
-    nitf.train()
+    nitfs: List[NITF] = models['nitf']
+    [x.train() for x in nitfs]
     dataLoader = DataLoader(
         trainSet, hParams.batch_size, shuffle=True, 
         drop_last=True, 
     )
-    slowOptim = torch.optim.Adam(
-        nitf.low_lr_latents, hParams.latent_low_lr, 
-    )
-    fastOptim = torch.optim.Adam(
-        nitf.high_lr_latents, hParams.latent_high_lr, 
-    )
+    oneshot_optims: List[Optimizer] = []
+    for nitf in nitfs:
+        slowOptim = Adam(
+            nitf.low_lr_latents, hParams.latent_low_lr, 
+        )
+        oneshot_optims.append(slowOptim)
+        fastOptim = Adam(
+            nitf.high_lr_latents, hParams.latent_high_lr, 
+        )
+        oneshot_optims.append(fastOptim)
     for batch_i, batch in enumerate(dataLoader):
         lossTree = Loss_root()
         if datasetDef.is_f0_latent:
-            batchF0IsLatent(lossTree, nitf, trainSet, hParams, *batch)
+            batchF0IsLatent(lossTree, nitfs, trainSet, hParams, *batch)
         else:
-            batchF0NotLatent(lossTree, hParams, nitf, *batch)
+            assert hParams.n_nifs == 1
+            batchF0NotLatent(lossTree, hParams, nitfs[0], *batch)
         optim.zero_grad()
-        slowOptim.zero_grad()
-        fastOptim.zero_grad()
+        [x.zero_grad() for x in oneshot_optims]
         total_loss = lossTree.sum(hParams.lossWeightTree, epoch)
         total_loss.backward()
         optim.step()
-        slowOptim.step()
-        fastOptim.step()
+        [x.step() for x in oneshot_optims]
         if hParams.nif_renorm_confidence:
-            nitf.renormConfidence()
+            [x.renormConfidence() for x in nitfs]
 
         lossLogger.eat(
             epoch, batch_i, True, profiler, lossTree, 
@@ -98,7 +102,7 @@ def oneEpoch(
 
     with torch.no_grad():
         if trainSet.datasetDef.is_f0_latent and epoch % 16 == 0:
-            nitf.simplifyDredge(fastOptim)
+            [x.simplifyDredge(fastOptim) for x in nitfs]
         
         if epoch % experiment.SLOW_EVAL_EPOCH_INTERVAL == 0:
             saveModels(models, epoch, save_path)
@@ -108,7 +112,7 @@ def oneEpoch(
         
         if LOG_SAMPLE_PAGE and datasetDef.is_f0_latent:
             logSamplePage(
-                epoch, nitf, hParams, trainSet, datasetDef, save_path, 
+                epoch, nitfs, hParams, trainSet, datasetDef, save_path, 
                 forwardF0IsLatent, 
             )
     
@@ -184,14 +188,20 @@ def forwardF0IsLatent(
 
 def batchF0IsLatent(
     lossTree: Loss_root, 
-    nitf: NITF, dataset: MyDataset, hParams: HyperParams, 
+    nitfs: List[NITF], dataset: MyDataset, hParams: HyperParams, 
     x, page_i, 
 ):
-    x_hat = forwardF0IsLatent(nitf, dataset, hParams, page_i)
+    x_hats = []
+    lossTree.dredge_regularize = torch.tensor(0).float().cpu()
+    for nitf in nitfs:
+        x_hats.append(forwardF0IsLatent(
+            nitf, dataset, hParams, page_i, 
+        ))
+        lossTree.dredge_regularize += regularizeDredge(
+            nitf.dredge_confidence[page_i, :], 
+        ).cpu()
+    x_hat = torch.stack(x_hats, dim=0).sum(dim=0)
     lossTree.harmonics = F.mse_loss(x_hat, x).cpu()
-    lossTree.dredge_regularize = regularizeDredge(
-        nitf.dredge_confidence[page_i, :], 
-    ).cpu()
 
 if __name__ == '__main__':
     main()

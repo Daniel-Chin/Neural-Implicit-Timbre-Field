@@ -20,10 +20,8 @@ timbre is
     energy = NIF(freq, f0, amplitude, [vowel_emb])
 
 f0 is:
-    pitch. scaler. 
-    octave: 16-dim multi-hot vector. 
-    
-    sum the three octaves near the max in forward pass. 
+    dredge_freq: scaler. 
+    dredge_confidence: 7-dim multi-hot vector. 
 
 About optim
     Parallel may not be important. If algo good, converge fast, few shot, then optim for GPU may be harmful and unecessary. 
@@ -91,7 +89,7 @@ experiments
     200-jacob acapella
     4-part choir
     bird chirps
-        bird "vowel" spave
+        bird "vowel" space
         source seperate
 
 TIMELINE
