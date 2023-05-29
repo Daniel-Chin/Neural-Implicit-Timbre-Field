@@ -37,19 +37,21 @@ template.lossWeightTree = LossWeightTree('total', 1, [
 template.lr = 1e-3
 template.weight_decay = 1e-9
 template.optim_name = 'adam'
+template.n_nifs = 1
 template.nif_width = 128
 template.nif_depth = 6
 template.n_vowel_dims = 2
 template.nif_sees_f0 = True
 template.nif_sees_amp = True
 template.nif_sees_vowel = True
-template.nif_abs_out = False
+template.nif_abs_out = True
 template.nif_abs_confidence = False
 template.nif_renorm_confidence = True
-template.nif_fast_lr = 2e-2
+template.latent_low_lr = 1e-3
+template.latent_high_lr = 1e-2
 template.ground_truth_f0 = False
 template.batch_size = 256
-template.max_epoch = 10000
+template.max_epoch = 1e3
 
 if DEBUG_CUT_CORNERS:
     template.batch_size //= 8
