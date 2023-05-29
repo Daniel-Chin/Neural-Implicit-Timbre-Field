@@ -9,8 +9,9 @@ from hyper_params import *
 from exp_group import ExperimentGroup
 from dataset import MyDataset
 
-from dataset_definitions import mss_0 as datasetDef
+from dataset_definitions import urmp_1 as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
+LOG_SAMPLE_PAGE = True
 
 EXP_NAME = 'mss'
 N_RAND_INITS = 3
@@ -51,9 +52,6 @@ template.nif_renorm_confidence = True
 template.ground_truth_f0 = False
 template.batch_size = 64
 template.max_epoch = 1e5
-
-if DEBUG_CUT_CORNERS:
-    template.batch_size //= 8
 
 template.lossWeightTree['dredge_regularize'].weight = 1e-6
 template.nif_abs_out = True
