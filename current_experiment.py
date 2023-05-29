@@ -20,9 +20,9 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'nif_abs_confidence'
+        self.variable_name = 'nif_abs_out'
         self.variable_value = (
-            nif_abs_confidence, 
+            nif_abs_out, 
         )
     
     @lru_cache(1)
@@ -62,8 +62,9 @@ template.latent_low_lr = 1e-3
 template.latent_high_lr = 1e-2
 template.max_epoch = 1e3
 
-for nif_abs_confidence in [False, True]:
+# next, test nif_sees_f0 etc. 
+for nif_abs_out in [False, True]:
     hP = deepcopy(template)
-    hP.nif_abs_confidence = nif_abs_confidence
+    hP.nif_abs_out = nif_abs_out
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))
