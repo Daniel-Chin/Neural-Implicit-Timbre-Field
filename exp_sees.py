@@ -9,11 +9,11 @@ from hyper_params import *
 from exp_group import ExperimentGroup
 from dataset import MyDataset
 
-from dataset_definitions import danF0IsLatent as datasetDef
+from dataset_definitions import voiceScaleF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 LOG_SAMPLE_PAGE = False
 
-EXP_NAME = 'sees'
+EXP_NAME = 'nif_sees_amp'
 N_RAND_INITS = 3
 dataset = MyDataset(datasetDef)
 
@@ -21,8 +21,8 @@ class MyExpGroup(ExperimentGroup):
     def __init__(self, hyperParams: HyperParams) -> None:
         self.hyperParams = hyperParams
 
-        self.variable_name = 'nif_sees_f0'
-        self.variable_value = hyperParams.nif_sees_f0
+        self.variable_name = 'nif_sees_amp'
+        self.variable_value = hyperParams.nif_sees_amp
     
     @lru_cache(1)
     def name(self):
@@ -54,8 +54,8 @@ template.ground_truth_f0 = False
 template.batch_size = 256
 template.max_epoch = 1e3
 
-for nif_sees_f0 in [False, True]:
+for nif_sees_amp in [False, True]:
     hP = deepcopy(template)
-    hP.nif_sees_f0 = nif_sees_f0
+    hP.nif_sees_amp = nif_sees_amp
     hP.ready(globals())
     GROUPS.append(MyExpGroup(hP))

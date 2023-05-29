@@ -51,12 +51,10 @@ template.nif_abs_confidence = False
 template.nif_renorm_confidence = True
 template.ground_truth_f0 = False
 template.batch_size = 64
-template.max_epoch = 1e5
+template.max_epoch = 1e3
 
-template.lossWeightTree['dredge_regularize'].weight = 1e-6
 template.latent_low_lr = 1e-3
 template.latent_high_lr = 1e-2
-template.max_epoch = 1e3
 template.n_nifs = 1
 
 for n_nifs in [2, 3]:

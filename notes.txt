@@ -103,3 +103,9 @@ TIMELINE
     2023_m05_d28@20_52_19_nif_abs_out
         No sig difference
         We'll make nif_abs_out=False
+    2023_m05_d28@20_55_25_sees
+        when NITF sees f0, 
+            recon loss is lower
+            dredge reg loss is higher
+            according to eval_synth, NITF's response to F0 is smooth, even when F0 is low (while NITF may be tempted to use low F0 to model noise)
+        let's make nif_sees_f0=True

@@ -6,13 +6,13 @@ from shared import *
 
 EXP_PATH = path.join('./experiments/',
 '''
-2023_m05_d28@20_52_19_nif_abs_out
+2023_m05_d28@20_55_25_sees
 '''
 .strip())
 
 def EPOCHS(experiment):
-    start = 0
-    # start = 80
+    # start = 0
+    start = 400
     # step = experiment.SLOW_EVAL_EPOCH_INTERVAL
     step = 8
     real_start = round(start / step) * step
@@ -22,9 +22,9 @@ def EPOCHS(experiment):
 
 # TIME_SLICE = slice(None)
 TIME_SLICE = slice(0, 256)
-SELECT_PAGE = round(.25 * SR / PAGE_LEN * 2)
+# SELECT_PAGE = round(.25 * SR / PAGE_LEN * 2)
 # SELECT_PAGE = round(1.35 * SR / PAGE_LEN * 2)
-# SELECT_PAGE = round(5.3 * SR / PAGE_LEN * 2)
+SELECT_PAGE = round(5.3 * SR / PAGE_LEN * 2)
 # SELECT_PAGE = round(19.5 * SR / PAGE_LEN * 2)
 SELECT_GROUPS = slice(None)
 # SELECT_GROUPS = slice(1, None)
