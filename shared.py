@@ -44,7 +44,8 @@ N_HARMONICS = 100
 
 TWO_PI = np.pi * 2
 HANN = scipy.signal.get_window('hann', PAGE_LEN, True)
-WINDOW_ENERGY = np.sqrt(np.square(HANN).sum())
+WINDOW_ENERGY = np.sqrt(np.square(HANN).mean())
+print(WINDOW_ENERGY)
 IMAGINARY_LADDER = np.linspace(0, TWO_PI * 1j, PAGE_LEN)
 SPECTRUM_SIZE = PAGE_LEN // 2 + 1
 NYQUIST = SR // 2
