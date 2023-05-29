@@ -61,6 +61,7 @@ template.nif_abs_confidence = False
 template.latent_low_lr = 1e-3
 template.latent_high_lr = 1e-2
 template.max_epoch = 1e3
+template.n_nifs = 1
 
 # next, test nif_sees_f0 etc. 
 for nif_abs_out in [False, True]:

@@ -61,6 +61,7 @@ template.nif_abs_confidence = True
 template.latent_low_lr = 1e-3
 template.latent_high_lr = 1e-2
 template.max_epoch = 1e3
+template.n_nifs = 1
 
 for n_nifs in [1, 2, 3]:
     hP = deepcopy(template)
