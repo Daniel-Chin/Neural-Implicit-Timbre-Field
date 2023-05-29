@@ -82,7 +82,8 @@ def tar(exp_dir_name):
                 for name in tqdm(
                     [*os.listdir(path.join(*paths))], name, 
                 ):
-                    if 'sample_page_epoch_' in name:
+                    name: str
+                    if name.startswith('sample_page') and name.endswith('.png'):
                         continue
                     if not name.startswith(prefix):
                         eat(name)

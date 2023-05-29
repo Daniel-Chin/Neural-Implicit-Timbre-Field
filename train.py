@@ -80,6 +80,9 @@ def oneEpoch(
         )
         oneshot_optims.append(fastOptim)
     for batch_i, batch in enumerate(dataLoader):
+        if DEBUG_CUT_CORNERS and batch_i == 4:
+            print('DEBUG_CUT_CORNERS')
+            break
         lossTree = Loss_root()
         if datasetDef.is_f0_latent:
             batchF0IsLatent(lossTree, nitfs, trainSet, hParams, *batch)

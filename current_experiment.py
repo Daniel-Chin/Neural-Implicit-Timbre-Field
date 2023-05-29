@@ -55,8 +55,6 @@ template.ground_truth_f0 = False
 template.batch_size = 256
 template.max_epoch = 1e3
 
-if DEBUG_CUT_CORNERS:
-    template.batch_size //= 8
 
 # next, test nif_sees_f0 etc. 
 for nif_abs_out in [False, True]:

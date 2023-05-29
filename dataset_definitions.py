@@ -2,10 +2,6 @@ from __future__ import annotations
 
 from os import path
 from typing import *
-from abc import ABCMeta, abstractmethod
-from copy import deepcopy
-
-import numpy as np
 
 from shared import *
 
@@ -20,9 +16,14 @@ DAN   = './dataset/dan.wav'
 YANHE = './dataset/yanhe.wav'
 VOICE_SCALE = './dataset/voice_scale.wav'
 
-sample_page_lookup = {
-    VOICE_SCALE: round(.25 * SR / PAGE_LEN * 2), 
-}
+URMP_01 = '01_Jupiter_vn_vc'
+
+def samplePageOf(dDef: DatasetDefinition):
+    if dDef.urmp_name == URMP_01:
+        return round(19.5 * SR / PAGE_LEN * 2)
+    if dDef.wav_path == VOICE_SCALE:
+        return round(.25 * SR / PAGE_LEN * 2)
+    assert False
 
 dF = DatasetDefinition()
 dF.wav_path = DAN
@@ -50,7 +51,7 @@ dF.is_f0_latent = True
 voiceScaleF0IsLatent = dF
 
 dF = DatasetDefinition()
-dF.urmp_name = '01_Jupiter_vn_vc'
+dF.urmp_name = URMP_01
 dF.is_f0_latent = True
 dF.wav_path = urmpWav(dF.urmp_name)
 urmp_1 = dF

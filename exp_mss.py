@@ -52,8 +52,6 @@ template.ground_truth_f0 = False
 template.batch_size = 64
 template.max_epoch = 1e5
 
-if DEBUG_CUT_CORNERS:
-    template.batch_size //= 8
 
 template.lossWeightTree['dredge_regularize'].weight = 1e-6
 template.nif_abs_out = True

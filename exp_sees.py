@@ -53,9 +53,6 @@ template.ground_truth_f0 = False
 template.batch_size = 256
 template.max_epoch = 1e3
 
-if DEBUG_CUT_CORNERS:
-    template.batch_size //= 8
-
 for nif_sees_f0 in [False, True]:
     hP = deepcopy(template)
     hP.nif_sees_f0 = nif_sees_f0

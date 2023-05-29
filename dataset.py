@@ -30,10 +30,8 @@ class MyDataset(Dataset):
         y, sr = librosa.load(datasetDef.wav_path, sr=SR, mono=True)
         print('read wav ok')
         assert sr == SR
-        # for debug. Beware n_batch=0
-        if DEBUG_CUT_CORNERS:
-            y = y[:round(len(y) * .1)]
         self.wav = y
+        self.mean_amp = np.sqrt(np.square(y).mean())
 
         if datasetDef.is_f0_latent:
             # print('stft...')
