@@ -196,16 +196,17 @@ def batchF0IsLatent(
     x, page_i, 
 ):
     x_hats = []
-    lossTree.dredge_regularize = torch.tensor(0).float().cpu()
+    reg_losses = []
     for nitf in nitfs:
         x_hats.append(forwardF0IsLatent(
             nitf, dataset, hParams, page_i, 
         ))
-        lossTree.dredge_regularize += regularizeDredge(
+        reg_losses.append(regularizeDredge(
             nitf.dredge_confidence[page_i, :], 
-        ).cpu()
+        ).cpu())
     x_hat = torch.stack(x_hats, dim=0).sum(dim=0)
     lossTree.harmonics = F.mse_loss(x_hat, x).cpu()
+    lossTree.dredge_regularize = torch.stack(reg_losses, dim=0).mean(dim=0)
 
 if __name__ == '__main__':
     main()
