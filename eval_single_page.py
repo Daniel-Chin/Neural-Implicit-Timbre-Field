@@ -39,8 +39,8 @@ def main():
         dataset: MyDataset = experiment.dataset
         
         truth_f0s = []
-        for track_i in range(2):
-            truth_f0s.append(dataset.f0_tracks[track_i][SELECT_PAGE].item())
+        for f0_track in dataset.f0_tracks:
+            truth_f0s.append(f0_track[SELECT_PAGE].item())
         
         for group in groups[SELECT_GROUPS]:
             group: ExperimentGroup

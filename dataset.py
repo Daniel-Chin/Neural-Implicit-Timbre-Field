@@ -66,7 +66,7 @@ class MyDataset(Dataset):
         if datasetDef.urmp_name is None:
             f0_track = []
             for time in self.times:
-                n = round(time * SR)
+                n = round(time.item() * SR)
                 page = self.wav[n : n + PAGE_LEN]
                 page = np.pad(page, (0, PAGE_LEN - len(page)))
                 f0_track.append(yin(

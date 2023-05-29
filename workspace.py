@@ -6,7 +6,7 @@ from shared import *
 
 EXP_PATH = path.join('./experiments/',
 '''
-2023_m05_d28@10_40_32_mss
+2023_m05_d28@20_52_19_nif_abs_out
 '''
 .strip())
 
@@ -22,10 +22,10 @@ def EPOCHS(experiment):
 
 # TIME_SLICE = slice(None)
 TIME_SLICE = slice(0, 256)
-# SELECT_PAGE = round(.25 * SR / PAGE_LEN * 2)
+SELECT_PAGE = round(.25 * SR / PAGE_LEN * 2)
 # SELECT_PAGE = round(1.35 * SR / PAGE_LEN * 2)
 # SELECT_PAGE = round(5.3 * SR / PAGE_LEN * 2)
-SELECT_PAGE = round(19.5 * SR / PAGE_LEN * 2)
+# SELECT_PAGE = round(19.5 * SR / PAGE_LEN * 2)
 SELECT_GROUPS = slice(None)
 # SELECT_GROUPS = slice(1, None)
 

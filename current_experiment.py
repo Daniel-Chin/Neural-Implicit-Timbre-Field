@@ -47,7 +47,7 @@ template.n_vowel_dims = 2
 template.nif_sees_f0 = True
 template.nif_sees_amp = True
 template.nif_sees_vowel = True
-template.nif_abs_out = True
+template.nif_abs_out = False
 template.nif_abs_confidence = False
 template.nif_renorm_confidence = True
 template.latent_low_lr = 1e-3
@@ -55,7 +55,6 @@ template.latent_high_lr = 1e-2
 template.ground_truth_f0 = False
 template.batch_size = 256
 template.max_epoch = 1e3
-
 
 # next, test nif_sees_f0 etc. 
 for nif_abs_out in [False, True]:
