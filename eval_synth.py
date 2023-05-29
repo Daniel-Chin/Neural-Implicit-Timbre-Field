@@ -28,7 +28,7 @@ from nitf import NITF
 from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 
-from workspace import EXP_PATH, EPOCHS
+from workspace import EXP_PATH, EPOCHS, SELECT_NITF
 
 PLOT_MAX_FPS = 10
 PLOT_RESOLUTION = 200
@@ -475,7 +475,7 @@ def main():
             cycleIntVar(epoch, 0, 1e8)
 
             try:
-                nitf = loadNITFWithCache(
+                nitfs = loadNITFWithCache(
                     group_selection.get(), 
                     rand_init_i.get(), 
                     epoch.get(), 
@@ -484,7 +484,7 @@ def main():
                 print(e)
                 epoch.set('0')
                 return refreshNITF()
-            nitfContainer[0] = nitf
+            nitfContainer[0] = nitfs[SELECT_NITF]
 
             if plotVowels is not None:
                 plotVowels()

@@ -56,7 +56,8 @@ class NITF(nn.Module):
             self.dredge_confidence[:, DREDGE_RADIUS] = 1
             
             if hParams.ground_truth_f0:
-                self.dredge_freq = freqNorm(dataset.f0s)
+                assert datasetDef.urmp_name is None
+                self.dredge_freq = freqNorm(dataset.f0_tracks[0])
             else:
                 self.dredge_freq = freqNorm(torch.ones(
                     (dataset.n_pages, ), 

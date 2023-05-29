@@ -13,12 +13,12 @@ class DatasetDefinition:
     def __init__(self) -> None:
         self.wav_path: str = None
         self.is_f0_latent: bool = None
+        self.urmp_name: str = None
         # is f0 and amp latent
 
 DAN   = './dataset/dan.wav'
 YANHE = './dataset/yanhe.wav'
 VOICE_SCALE = './dataset/voice_scale.wav'
-MSS_0 = './dataset/URMP/01_Jupiter_vn_vc/AuMix_01_Jupiter_vn_vc.wav'
 
 sample_page_lookup = {
     VOICE_SCALE: round(.25 * SR / PAGE_LEN * 2), 
@@ -50,6 +50,7 @@ dF.is_f0_latent = True
 voiceScaleF0IsLatent = dF
 
 dF = DatasetDefinition()
-dF.wav_path = MSS_0
+dF.urmp_name = '01_Jupiter_vn_vc'
 dF.is_f0_latent = True
-mss_0 = dF
+dF.wav_path = urmpWav(dF.urmp_name)
+urmp_1 = dF

@@ -9,7 +9,7 @@ from hyper_params import *
 from exp_group import ExperimentGroup
 from dataset import MyDataset
 
-from dataset_definitions import mss_0 as datasetDef
+from dataset_definitions import urmp_1 as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
 EXP_NAME = 'mss'

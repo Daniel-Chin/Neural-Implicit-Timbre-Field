@@ -33,14 +33,14 @@ def main():
             # if True:
                 for epoch in EPOCHS(experiment):
                     try:
-                        nitf = loadNITFForEval(
+                        nitfs = loadNITFForEval(
                             EXP_PATH, experiment.datasetDef, 
                             group, rand_init_i, epoch, 
                         )
                     except FileNotFoundError:
                         break
                     print(f'{epoch = }')
-                    evalOne(nitf, dataset, group.hyperParams)
+                    evalOne(nitfs, dataset, group.hyperParams)
                     # plt.show()
                     plt.savefig(path.join(
                         getTrainerPath(
@@ -51,7 +51,7 @@ def main():
                         f'spectrogram_{epoch}.png', 
                     ), dpi=200)
 
-def evalOne(nitf: NITF, dataset: MyDataset, hParams):
+def evalOne(nitfs: List[NITF], dataset: MyDataset, hParams):
     fig = plt.figure()
     axes = fig.subplots(2, 1, sharex=True)
     axes: List[plt.Axes] = axes.tolist()
@@ -69,10 +69,13 @@ def evalOne(nitf: NITF, dataset: MyDataset, hParams):
     axes[0].set_xlabel('Time (sec)')
     axes[0].set_ylabel('Freq (Hz)')
     # print('forward...')
-    x_hat = forwardF0IsLatent(
-        nitf, dataset, hParams, dataset.I[TIME_SLICE], 
-        batch_size_override=len(times),
-    )
+    x_hats = []
+    for nitf in nitfs:
+        x_hats.append(forwardF0IsLatent(
+            nitf, dataset, hParams, dataset.I[TIME_SLICE], 
+            batch_size_override=len(times),
+        ))
+    x_hat = torch.stack(x_hats, dim=0).sum(dim=0)
     # print('plot 1...')
     data_1 = x_hat.T.clip(1e-8)
     # data_1 = data_1.log()

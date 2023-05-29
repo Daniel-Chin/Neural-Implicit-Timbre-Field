@@ -20,6 +20,8 @@ __all__ = [
     'freqNorm', 
     'freqDenorm', 
     'colorLadder', 
+    'urmpWav', 
+    'urmpF0', 
 ]
 
 from typing import *
@@ -82,3 +84,9 @@ def colorLadder(length):
     B = np.linspace(0, 0, length)
     C = [*zip(R, G, B)]
     return C
+
+def urmpWav(name):
+    return './dataset/URMP/%s/AuMix_%s.wav' % (name, name)
+def urmpF0(name: str, track_i):
+    id, song, *ins = name.split('_')
+    return f'./dataset/URMP/{name}/F0s_{track_i + 1}_{ins[track_i]}_{id}_{song}.txt'

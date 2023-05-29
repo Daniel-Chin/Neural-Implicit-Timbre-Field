@@ -9,7 +9,7 @@ from hyper_params import *
 from exp_group import ExperimentGroup
 from dataset import MyDataset
 
-from dataset_definitions import mss_0 as datasetDef
+from dataset_definitions import urmp_1 as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
 EXP_NAME = 'mss'
@@ -63,7 +63,7 @@ template.latent_high_lr = 1e-2
 template.max_epoch = 1e3
 template.n_nifs = 1
 
-for n_nifs in [1, 2, 3]:
+for n_nifs in [2, 3]:
     hP = deepcopy(template)
     hP.n_nifs = n_nifs
     hP.ready(globals())

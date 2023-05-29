@@ -18,6 +18,7 @@ from shared import *
 from dataset_definitions import (
     DatasetDefinition, voiceScaleF0IsLatent as datasetDef, 
 )
+from manual_fc import ManualFC
 
 class MyDataset(Dataset):
     def __init__(self, datasetDef: DatasetDefinition) -> None:
@@ -54,23 +55,36 @@ class MyDataset(Dataset):
                 0, self.n_pages, dtype=torch.long, 
             ).to(DEVICE).contiguous()
 
-            f0s = []
-            for time in times:
-                n = round(time * SR)
-                page = y[n : n + PAGE_LEN]
-                page = np.pad(page, (0, PAGE_LEN - len(page)))
-                f0s.append(yin(
-                    page, SR, PAGE_LEN, 
-                    fmin=pitch2freq(36), 
-                    fmax=pitch2freq(84), 
-                ))
-            self.f0s = torch.tensor(f0s).float().to(DEVICE).contiguous()
+            self.groundTruthF0(datasetDef)
         else:
             f0s, timbres, amps = self.getStreams(y)
             self.n_pages = len(f0s)
             self.initF0NotLatent(f0s, timbres, amps)
         
         print('dataset ok')
+
+    def groundTruthF0(self, datasetDef: DatasetDefinition):
+        self.f0_tracks = []
+        if datasetDef.urmp_name is None:
+            f0_track = []
+            for time in self.times:
+                n = round(time * SR)
+                page = self.wav[n : n + PAGE_LEN]
+                page = np.pad(page, (0, PAGE_LEN - len(page)))
+                f0_track.append(yin(
+                    page, SR, PAGE_LEN, 
+                    fmin=pitch2freq(36), 
+                    fmax=pitch2freq(84), 
+                ))
+            self.f0_tracks.append(
+                torch.tensor(f0_track).float().to(DEVICE).contiguous()
+            )
+        else:
+            for track_i in range(2):
+                f0_track = getUrmpF0(
+                    datasetDef.urmp_name, track_i, 
+                )(self.times + PAGE_LEN * .5 / SR).float().to(DEVICE).contiguous()
+                self.f0_tracks.append(f0_track)
 
     def getStreams(self, y):
         f0s = []
@@ -182,6 +196,19 @@ def preview():
         plt.plot(dataset.freqs, spectrum)
         plt.title(f'Page {i} at {time:.3f} sec')
         plt.show()
+
+def getUrmpF0(urmp_name, track_i):
+    T = []
+    F = []
+    with open(urmpF0(urmp_name, track_i), 'r', encoding='utf-8') as f:
+        for line in f:
+            t, f = line.strip().split('\t')
+            T.append(float(t))
+            F.append(float(f))
+    T.append(T[-1] + 1)
+    F.append(F[-1])
+    mfc = ManualFC(torch.tensor(T), torch.tensor(F))
+    return mfc
 
 if __name__ == '__main__':
     preview()

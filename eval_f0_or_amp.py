@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 
 from import_dan_py import ImportDanPy
 with ImportDanPy():
-    from yin import yin
+    pass
 
 from shared import *
 from exp_group import ExperimentGroup
@@ -18,7 +18,9 @@ from nitf import NITF
 from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 
-from workspace import EXP_PATH, EPOCHS, SELECT_GROUPS, TIME_SLICE
+from workspace import (
+    EXP_PATH, EPOCHS, SELECT_GROUPS, TIME_SLICE, 
+)
 
 def main():
     with torch.no_grad():
@@ -28,61 +30,76 @@ def main():
         print(f'{exp_name = }')
 
         dataset: MyDataset = experiment.dataset
-        truth_t = []
-        truth_f0 = []
+        truth_t = dataset.times
+        truth_f0 = dataset.f0_tracks
         truth_amp = []
-        for i, page in enumerate(pagesOf(dataset.wav)):
-            f0 = yin(page, SR, PAGE_LEN, fmin=80, fmax=800)
-            amp = np.sqrt(np.square(page).sum())
-            truth_t.append(i * PAGE_LEN / SR)
-            truth_f0.append(f0)
+        for t in truth_t:
+            start = round(SR * t.item())
+            page = dataset.wav[start : start + PAGE_LEN]
+            if len(page) == 0:
+                # stft zero pad
+                amp = 0
+            else:
+                amp = np.sqrt(np.square(page).mean())
             truth_amp.append(amp)
-    C = colorLadder(len(groups))
+        # C = colorLadder(len(groups))
+        C = colorLadder(2)
         
-    def f():
-        for epoch in EPOCHS(experiment):
-            print(f'{epoch = }')
-            plt.plot(
-                truth_t, truth_f0, 
-                'o', 
-                markersize=8, markerfacecolor='none', 
-                markeredgewidth=.5, 
-                label='YIN', 
-            )
+        def plotTruth():
+            kw = dict(label='Ground truth')
+            for track_i, t_f0 in enumerate(truth_f0):
+                plt.plot(
+                    truth_t, t_f0, 
+                    'ox'[track_i], 
+                    markersize=8, 
+                    markerfacecolor='none', markeredgecolor='k', 
+                    markeredgewidth=.5, 
+                    **kw, 
+                )
+                kw.clear()
             # plt.plot(
             #     truth_t, truth_amp, 
             #     'o', linewidth=.5, markersize=.5, 
             #     label='Ground truth', 
             # )
+        
+        for epoch in EPOCHS(experiment):
+            print(f'{epoch = }')
+            # plotTruth()
             for group_i, group in enumerate(groups[SELECT_GROUPS]):
-                kw = dict(label=group.name())
+                # kw = dict(label=group.name())
+                print(group.name())
                 for rand_init_i in range(n_rand_inits):
                 # rand_init_i = 0
                 # if True:
+                    print(f'{rand_init_i = }')
                     try:
-                        nitf = loadNITFForEval(
+                        nitfs = loadNITFForEval(
                             EXP_PATH, experiment.datasetDef, 
                             group, rand_init_i, epoch, 
                         )
                     except FileNotFoundError:
                         return
-                    plt.plot(
-                        dataset.times, 
-                        freqDenorm(nitf.dredge_freq), 
-                        # nitf.amp_latent, 
-                        'xv^s.'[group_i], 
-                        markersize=6, markerfacecolor='none', 
-                        markeredgewidth=.5, 
-                        c=C[group_i], 
-                        **kw, 
-                    )
-                    kw.clear()
+                    plotTruth()
+                    for nitf_i, nitf in enumerate(nitfs):
+                        plt.plot(
+                            dataset.times, 
+                            freqDenorm(nitf.dredge_freq), 
+                            # nitf.amp_latent, 
+                            # 'xv^s.'[group_i], 
+                            '^v'[nitf_i], 
+                            markersize=6, markerfacecolor='none', 
+                            markeredgewidth=.5, 
+                            # c=C[group_i], 
+                            c=C[nitf_i], 
+                            # **kw, 
+                        )
+                    # kw.clear()
+                    plt.legend()
+                    plt.show()
             # plt.yscale('log')
-            plt.legend()
-            plt.show()
-        
-    with torch.no_grad():
-        f()
+            # plt.legend()
+            # plt.show()
 
 if __name__ == '__main__':
     main()

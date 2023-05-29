@@ -11,6 +11,7 @@ except ImportError:
 
 LOSS_TYPES_TO_PLOT = [
     LossType('train', 'loss_root.harmonics'), 
+    LossType('train', 'loss_root.dredge_regularize'), 
 ]
 
 plotLosses = PlotLosses(

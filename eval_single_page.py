@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 from import_dan_py import ImportDanPy
 with ImportDanPy():
-    from yin import yin
+    pass
 
 from shared import *
 from exp_group import ExperimentGroup
@@ -20,7 +20,9 @@ from dataset import MyDataset
 from load_for_eval import loadNITFForEval
 from dredge import *
 
-from workspace import EXP_PATH, EPOCHS, SELECT_PAGE
+from workspace import (
+    EXP_PATH, EPOCHS, SELECT_PAGE, SELECT_GROUPS, 
+)
 
 C = colorLadder(DREDGE_LEN)
 C[DREDGE_RADIUS] = 'k'
@@ -36,64 +38,66 @@ def main():
         assert next(iter(EPOCHS(experiment))) == 0
         dataset: MyDataset = experiment.dataset
         
-        t = dataset.times[SELECT_PAGE].item()
-        audio= dataset.wav[
-            round(t * SR) : 
-            round(t * SR) + PAGE_LEN
-        ]
-        yin_f0 = yin(audio, SR, PAGE_LEN)
-        print(f'{yin_f0 = }')
+        truth_f0s = []
+        for track_i in range(2):
+            truth_f0s.append(dataset.f0_tracks[track_i][SELECT_PAGE].item())
         
-        for group in groups:
+        for group in groups[SELECT_GROUPS]:
+            group: ExperimentGroup
             print(group.name())
             for rand_init_i in range(n_rand_inits):
             # rand_init_i = 0
             # if True:
                 print(f'{rand_init_i = }')
-                confidences = []
-                freqs = []
-                epochs = []
-                for epoch in tqdm(EPOCHS(experiment)):
-                    try:
-                        nitf = loadNITFForEval(
-                            EXP_PATH, experiment.datasetDef, 
-                            group, rand_init_i, epoch, 
-                        )
-                    except FileNotFoundError as e:
-                        print(epoch, e)
-                        break
-                    confidences.append(nitf.dredge_confidence[SELECT_PAGE, :])
-                    freqs.append(freqDenorm(nitf.dredge_freq[SELECT_PAGE].item()))
-                    epochs.append(epoch)
-                print('final f0 is', freqs[-1])
-                confidences = torch.stack(confidences, dim=0).T
-                fig, axes = plt.subplots(2, sharex=True)
-                axes: List[plt.Axes]
-                axes[0].plot(epochs, freqs, label='freq')
-                for i, mult in enumerate(DREDGE_MULT):
-                    kw = {}
-                    if i == DREDGE_RADIUS:
-                        kw['label'] = 'YIN'
-                    axes[0].axhline(
-                        yin_f0 * mult, c=C[i], 
-                        linewidth=.5, 
-                        **kw, 
-                    )
+                for nitf_i in range(group.hyperParams.n_nifs):
+                    print(f'{nitf_i = }')
+                    confidences = []
+                    freqs = []
+                    epochs = []
+                    for epoch in tqdm(EPOCHS(experiment)):
+                        try:
+                            nitfs = loadNITFForEval(
+                                EXP_PATH, experiment.datasetDef, 
+                                group, rand_init_i, epoch, 
+                            )
+                        except FileNotFoundError as e:
+                            print(epoch, e)
+                            break
+                        nitf = nitfs[nitf_i]
+                        confidences.append(nitf.dredge_confidence[SELECT_PAGE, :])
+                        freqs.append(freqDenorm(nitf.dredge_freq[SELECT_PAGE].item()))
+                        epochs.append(epoch)
+                    print('final f0 is', freqs[-1])
+                    confidences = torch.stack(confidences, dim=0).T
+                    fig, axes = plt.subplots(2, sharex=True)
+                    axes: List[plt.Axes]
+                    axes[0].plot(epochs, freqs, label='freq')
+                    for i, mult in enumerate(DREDGE_MULT):
+                        kw = {}
+                        if i == DREDGE_RADIUS:
+                            kw['label'] = 'Truth'
+                        for truth_f0 in truth_f0s:
+                            axes[0].axhline(
+                                truth_f0 * mult, c=C[i], 
+                                linewidth=.5, 
+                                **kw, 
+                            )
+                            kw.clear()
 
-                    axes[1].plot(
-                        epochs, confidences[i, :], 
-                        'xv^s<>.'[i], 
-                        markersize=4, markerfacecolor='none', 
-                        markeredgewidth=.5, 
-                        c=C[i], 
-                        label=f'{mult:.2f}', 
-                    )
-                axes[0].legend()
-                axes[1].legend()
-                axes[1].set_xlabel('Epoch')
-                axes[0].set_ylabel('Freq (Hz)')
-                axes[1].set_ylabel('Confidence')
-                plt.show()
+                        axes[1].plot(
+                            epochs, confidences[i, :], 
+                            'xv^s<>.'[i], 
+                            markersize=4, markerfacecolor='none', 
+                            markeredgewidth=.5, 
+                            c=C[i], 
+                            label=f'{mult:.2f}', 
+                        )
+                    axes[0].legend()
+                    axes[1].legend()
+                    axes[1].set_xlabel('Epoch')
+                    axes[0].set_ylabel('Freq (Hz)')
+                    axes[1].set_ylabel('Confidence')
+                    plt.show()
 
 if __name__ == '__main__':
     main()
