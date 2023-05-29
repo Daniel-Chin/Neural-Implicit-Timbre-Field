@@ -2,7 +2,6 @@ from __future__ import annotations
 
 __all__ = [
     'DEBUG_CUT_CORNERS', 
-    'LOG_SAMPLE_PAGE', 
     'PAGE_LEN', 
     'SR', 
     'DTYPE', 
