@@ -43,7 +43,6 @@ def main():
                 amp = np.sqrt(np.square(page).mean())
             truth_amp.append(amp)
         # C = colorLadder(len(groups))
-        C = colorLadder(2)
         
         def plotTruth():
             kw = dict(label='Ground truth')
@@ -80,6 +79,7 @@ def main():
                         )
                     except FileNotFoundError:
                         return
+                    C = colorLadder(len(nitfs))
                     plotTruth()
                     for nitf_i, nitf in enumerate(nitfs):
                         plt.plot(
@@ -87,7 +87,7 @@ def main():
                             freqDenorm(nitf.dredge_freq), 
                             # nitf.amp_latent, 
                             # 'xv^s.'[group_i], 
-                            '^v'[nitf_i], 
+                            '^vsx.'[nitf_i], 
                             markersize=6, markerfacecolor='none', 
                             markeredgewidth=.5, 
                             # c=C[group_i], 
