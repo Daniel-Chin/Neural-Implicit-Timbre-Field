@@ -2,4 +2,5 @@
 
 module purge
 source /scratch/$USER/py_env/symmEnv/select_images
-srun --time=1:00:00 --pty singularity exec --overlay /scratch/$USER/py_env/$ENV_NAME/$OVERLAY:ro /scratch/work/public/singularity/$SINGULARITY /bin/bash -c 'source /ext3/env.sh; python ship.py $1'
+take_every=$1
+srun --time=1:00:00 --pty singularity exec --overlay /scratch/$USER/py_env/$ENV_NAME/$OVERLAY:ro /scratch/work/public/singularity/$SINGULARITY /bin/bash -c 'source /ext3/env.sh; python ship.py ${take_every}'
