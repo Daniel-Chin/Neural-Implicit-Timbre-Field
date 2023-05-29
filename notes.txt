@@ -1,5 +1,8 @@
 DL todo
     eval_synth voice embedding distribution visualize: remove unpitched pages
+    maybe we need to adapt LR to n_batch_per_epoch. 
+        the frequency we step the NITF is different from the frequency we step each page's latents, and ths differences changes with n_batch_per_epoch. 
+        To ensure an equivalent dynamic, LR may need to adapt. 
 
 amplitude inductive bias
     at first, i thought: assume most amplitude to be 0. Like a lasso loss. 
@@ -109,3 +112,6 @@ TIMELINE
             dredge reg loss is higher
             according to eval_synth, NITF's response to F0 is smooth, even when F0 is low (while NITF may be tempted to use low F0 to model noise)
         let's make nif_sees_f0=True
+    2023_m05_d29@02_37_01_nif_sees_amp
+        no sig diff. 
+        let's make nif_sees_amp=True

@@ -57,6 +57,9 @@ template.latent_low_lr = 1e-3
 template.latent_high_lr = 1e-2
 template.n_nifs = 1
 
+template.lossWeightTree['dredge_regularize'].weight = 1e-7
+template.lr = 1e-4
+
 for n_nifs in [2, 3]:
     hP = deepcopy(template)
     hP.n_nifs = n_nifs
