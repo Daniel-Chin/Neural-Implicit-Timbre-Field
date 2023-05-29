@@ -44,7 +44,7 @@ def logSamplePage(
         ax.plot(X.cpu(), Y.cpu(), label='NITF')
         f0 = freqDenorm(nitf.dredge_freq[page_i])
         f0s = f0.cpu() * DREDGE_MULT.cpu()
-        y_lim = dataset.mean_amp * 2
+        y_lim = dataset.mean_amp / WINDOW_ENERGY * 2
         ax.vlines(
             f0s, ymin=0, 
             ymax = nitf.dredge_confidence[page_i, :].cpu().abs() * y_lim * .5, 
