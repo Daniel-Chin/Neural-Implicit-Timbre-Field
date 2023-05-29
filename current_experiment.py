@@ -57,7 +57,7 @@ if DEBUG_CUT_CORNERS:
 
 template.lossWeightTree['dredge_regularize'].weight = 1e-6
 template.nif_abs_out = True
-template.nif_abs_confidence = True
+template.nif_abs_confidence = False
 template.latent_low_lr = 1e-3
 template.latent_high_lr = 1e-2
 template.max_epoch = 1e3

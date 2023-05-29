@@ -22,10 +22,7 @@ from dredge import *
 
 from workspace import EXP_PATH, EPOCHS, SELECT_PAGE
 
-R = np.linspace(0, 1, DREDGE_LEN)
-G = np.linspace(1, 0, DREDGE_LEN)
-B = np.linspace(0, 0, DREDGE_LEN)
-C = [*zip(R, G, B)]
+C = colorLadder(DREDGE_LEN)
 C[DREDGE_RADIUS] = 'k'
 
 def main():

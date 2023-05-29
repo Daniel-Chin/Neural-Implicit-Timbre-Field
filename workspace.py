@@ -11,13 +11,13 @@ EXP_PATH = path.join('./experiments/',
 .strip())
 
 def EPOCHS(experiment):
-    # start = 0
-    start = 800
+    start = 0
+    # start = 800
     step = experiment.SLOW_EVAL_EPOCH_INTERVAL
     # step = 16
     real_start = round(start / step) * step
-    # return count(real_start, step)
-    return range(real_start, real_start + step * 8, step)
+    return count(real_start, step)
+    # return range(real_start, real_start + step * 8, step)
     # return range(real_start, 3000, step)
 
 # TIME_SLICE = slice(None)

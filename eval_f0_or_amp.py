@@ -37,6 +37,7 @@ def main():
             truth_t.append(i * PAGE_LEN / SR)
             truth_f0.append(f0)
             truth_amp.append(amp)
+    C = colorLadder(len(groups))
         
     def f():
         for epoch in EPOCHS(experiment):
@@ -72,6 +73,7 @@ def main():
                         'xv^s.'[group_i], 
                         markersize=6, markerfacecolor='none', 
                         markeredgewidth=.5, 
+                        c=C[group_i], 
                         **kw, 
                     )
                     kw.clear()

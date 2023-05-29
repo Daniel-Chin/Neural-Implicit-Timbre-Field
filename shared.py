@@ -19,6 +19,7 @@ __all__ = [
     'plotUnstretchedPartials', 
     'freqNorm', 
     'freqDenorm', 
+    'colorLadder', 
 ]
 
 from typing import *
@@ -74,3 +75,10 @@ def freqDenorm(emb):
         return abs(x)
 a = torch.randn(100).abs()
 assert (np.abs(freqNorm(freqDenorm(a)) - a) < 1e-6).all()
+
+def colorLadder(length):
+    R = np.linspace(0, 1, length)
+    G = np.linspace(1, 0, length)
+    B = np.linspace(0, 0, length)
+    C = [*zip(R, G, B)]
+    return C

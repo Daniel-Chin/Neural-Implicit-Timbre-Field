@@ -96,3 +96,7 @@ TIMELINE
 5/22
     2023_m05_d19@21_21_44_not_latent
     freqNorm and eval_synth are working properly. Next, f0 is latent. 
+5/29
+    2023_m05_d28@09_45_29_nif_abs_confidence
+    No sig difference. Look at loss, eval_f0, eval_single_page. 
+    We'll make nif_abs_confidence=False
