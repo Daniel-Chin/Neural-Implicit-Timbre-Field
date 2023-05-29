@@ -12,7 +12,7 @@ from dataset import MyDataset
 from dataset_definitions import voiceScaleF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
 
-EXP_NAME = 'nif_abs_confidence'
+EXP_NAME = 'nif_abs_out'
 N_RAND_INITS = 3
 dataset = MyDataset(datasetDef)
 
