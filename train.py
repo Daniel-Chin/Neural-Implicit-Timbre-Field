@@ -114,7 +114,7 @@ def oneEpoch(
             print(group_name, 'epoch', epoch, 'finished.', flush=True)
             # print('last batch loss =', total_loss.item(), flush=True)
         
-        if LOG_SAMPLE_PAGE and datasetDef.is_f0_latent:
+        if experiment.LOG_SAMPLE_PAGE and datasetDef.is_f0_latent:
             logSamplePage(
                 epoch, nitfs, hParams, trainSet, datasetDef, save_path, 
                 forwardF0IsLatent, 

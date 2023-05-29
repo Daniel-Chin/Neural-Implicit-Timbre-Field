@@ -11,6 +11,7 @@ from dataset import MyDataset
 
 from dataset_definitions import danF0NotLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
+LOG_SAMPLE_PAGE = False
 
 EXP_NAME = ...
 N_RAND_INITS = 8
@@ -52,7 +53,6 @@ template.latent_high_lr = 1e-2
 template.ground_truth_f0 = None
 template.batch_size = 2 ** 12
 template.max_epoch = 10000
-
 
 for xxx in []:
     hP = deepcopy(template)

@@ -11,6 +11,7 @@ from dataset import MyDataset
 
 from dataset_definitions import danF0IsLatent as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
+LOG_SAMPLE_PAGE = False
 
 EXP_NAME = 'sees'
 N_RAND_INITS = 3

@@ -11,6 +11,7 @@ from dataset import MyDataset
 
 from dataset_definitions import urmp_1 as datasetDef
 SLOW_EVAL_EPOCH_INTERVAL = 1
+LOG_SAMPLE_PAGE = True
 
 EXP_NAME = 'mss'
 N_RAND_INITS = 3
