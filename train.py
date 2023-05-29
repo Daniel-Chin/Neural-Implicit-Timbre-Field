@@ -100,6 +100,7 @@ def oneEpoch(
             hParams.lossWeightTree, 
         )
 
+    [x.eval() for x in nitfs]
     with torch.no_grad():
         if trainSet.datasetDef.is_f0_latent and epoch % 16 == 0:
             [x.simplifyDredge(fastOptim) for x in nitfs]
