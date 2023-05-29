@@ -12,6 +12,7 @@ try:
     TAKE_EVERY = int(sys.argv[1])
     print('TAKE_EVERY =', TAKE_EVERY)
 except:
+    print('sys.argv =', sys.argv)
     TAKE_EVERY = 1
 
 def main():
