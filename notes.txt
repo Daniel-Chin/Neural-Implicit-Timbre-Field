@@ -115,3 +115,9 @@ TIMELINE
     2023_m05_d29@02_37_01_nif_sees_amp
         no sig diff. 
         let's make nif_sees_amp=True
+    2023_m05_d29@01_08_19_mss
+        - maybe the dredge reg is making f0 too low. 
+        - NITF spectral envelope is too irregular too early. This is abnormal compared to previous experiments. This experiment has a much higher n_batch_per_epoch. maybe we need to adapt LR to n_batch_per_epoch. 
+            the frequency we step the NITF is different from the frequency we step each page's latents, and ths differences changes with n_batch_per_epoch. 
+            To ensure an equivalent dynamic, LR may need to adapt. 
+        next: decrease dredge reg and lr. 
